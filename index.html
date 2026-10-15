@@ -3,17 +3,20 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>CineApp - Prototipo Interactivo (Metodología)</title>
+  <title>CineApp - Prototipo Interactivo de Alta Fidelidad (Metodología)</title>
   <style>
     :root {
       --bg: #090b10;
       --card-bg: #141824;
       --accent: #e50914;
-      --accent-glow: rgba(229, 9, 20, 0.4);
+      --accent-glow: rgba(229, 9, 20, 0.45);
       --hotspot-color: rgba(56, 189, 248, 0.35);
       --hotspot-border: #38bdf8;
       --text: #f1f5f9;
       --text-muted: #94a3b8;
+      --success: #22c55e;
+      --warning: #f59e0b;
+      --cyan: #38bdf8;
     }
 
     * {
@@ -27,8 +30,8 @@
     body {
       background-color: var(--bg);
       background-image: 
-        radial-gradient(circle at 50% 10%, rgba(229, 9, 20, 0.12), transparent 45%),
-        radial-gradient(circle at 80% 80%, rgba(56, 189, 248, 0.08), transparent 40%);
+        radial-gradient(circle at 50% 10%, rgba(229, 9, 20, 0.14), transparent 45%),
+        radial-gradient(circle at 80% 80%, rgba(56, 189, 248, 0.09), transparent 40%);
       color: var(--text);
       font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
       min-height: 100vh;
@@ -39,24 +42,25 @@
 
     /* Top Control Bar */
     header {
-      background: rgba(20, 24, 36, 0.85);
-      backdrop-filter: blur(12px);
-      -webkit-backdrop-filter: blur(12px);
+      background: rgba(20, 24, 36, 0.9);
+      backdrop-filter: blur(14px);
+      -webkit-backdrop-filter: blur(14px);
       border-bottom: 1px solid rgba(255, 255, 255, 0.08);
-      padding: 10px 24px;
+      padding: 8px 20px;
       display: flex;
       align-items: center;
       justify-content: space-between;
-      gap: 16px;
+      gap: 12px;
       z-index: 100;
       position: sticky;
       top: 0;
+      flex-wrap: wrap;
     }
 
     .brand {
       display: flex;
       align-items: center;
-      gap: 12px;
+      gap: 10px;
     }
 
     .logo-badge {
@@ -71,30 +75,83 @@
     }
 
     .brand h1 {
-      font-size: 15px;
+      font-size: 14px;
       font-weight: 600;
       color: #fff;
     }
 
     .brand span {
-      font-size: 12px;
+      font-size: 11px;
       color: var(--text-muted);
-      margin-left: 6px;
+      margin-left: 4px;
+    }
+
+    /* Stepper / Breadcrumbs Bar */
+    .flow-stepper {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      background: rgba(0, 0, 0, 0.35);
+      padding: 4px 8px;
+      border-radius: 10px;
+      border: 1px solid rgba(255, 255, 255, 0.06);
+    }
+
+    .step-chip {
+      display: flex;
+      align-items: center;
+      gap: 5px;
+      font-size: 11px;
+      padding: 4px 8px;
+      border-radius: 6px;
+      cursor: pointer;
+      color: var(--text-muted);
+      transition: all 0.2s ease;
+      font-weight: 500;
+    }
+
+    .step-chip:hover {
+      color: #fff;
+      background: rgba(255, 255, 255, 0.08);
+    }
+
+    .step-chip.active {
+      color: #fff;
+      background: rgba(229, 9, 20, 0.25);
+      border: 1px solid rgba(229, 9, 20, 0.5);
+      box-shadow: 0 0 8px rgba(229, 9, 20, 0.3);
+    }
+
+    .step-num {
+      width: 16px;
+      height: 16px;
+      border-radius: 50%;
+      background: rgba(255, 255, 255, 0.12);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 9.5px;
+      font-weight: bold;
+    }
+
+    .step-chip.active .step-num {
+      background: var(--accent);
+      color: #fff;
     }
 
     .controls {
       display: flex;
       align-items: center;
-      gap: 10px;
+      gap: 8px;
     }
 
     .btn {
       background: rgba(255, 255, 255, 0.06);
       border: 1px solid rgba(255, 255, 255, 0.12);
       color: var(--text);
-      padding: 7px 14px;
+      padding: 6px 12px;
       border-radius: 8px;
-      font-size: 12px;
+      font-size: 11.5px;
       font-weight: 500;
       cursor: pointer;
       display: inline-flex;
@@ -119,12 +176,12 @@
       background: rgba(255, 255, 255, 0.06);
       border: 1px solid rgba(255, 255, 255, 0.15);
       color: #fff;
-      padding: 7px 12px;
+      padding: 6px 10px;
       border-radius: 8px;
-      font-size: 12px;
+      font-size: 11.5px;
       outline: none;
       cursor: pointer;
-      max-width: 250px;
+      max-width: 210px;
     }
 
     .select-screen option {
@@ -138,7 +195,7 @@
       display: flex;
       justify-content: center;
       align-items: center;
-      padding: 16px;
+      padding: 12px;
       position: relative;
     }
 
@@ -157,6 +214,16 @@
       transition: transform 0.2s ease;
     }
 
+    .phone-viewport.shake {
+      animation: phone-shake 0.4s ease-in-out;
+    }
+
+    @keyframes phone-shake {
+      0%, 100% { transform: translateX(0); }
+      20%, 60% { transform: translateX(-8px); }
+      40%, 80% { transform: translateX(8px); }
+    }
+
     .screen-img {
       position: absolute;
       top: 0;
@@ -166,7 +233,7 @@
       object-fit: contain;
       display: none;
       opacity: 0;
-      transition: opacity 0.22s ease-in-out;
+      transition: opacity 0.2s ease-in-out;
       pointer-events: none;
     }
 
@@ -195,6 +262,22 @@
 
     .hotspot:active {
       transform: scale(0.985);
+    }
+
+    /* Dynamic Interactive Widgets Layer */
+    .interactive-layer {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      z-index: 30;
+      pointer-events: none;
+    }
+
+    .interactive-widget {
+      position: absolute;
+      pointer-events: auto;
     }
 
     /* Visible Hints Mode */
@@ -241,6 +324,449 @@
       }
     }
 
+    /* Interactive Seat Map Styling */
+    .seat-overlay-grid {
+      display: grid;
+      grid-template-columns: repeat(10, 1fr);
+      grid-gap: 2.2% 1.8%;
+      width: 100%;
+      height: 100%;
+    }
+
+    .seat-cell {
+      position: relative;
+      cursor: pointer;
+      border-radius: 4px;
+      transition: all 0.18s cubic-bezier(0.16, 1, 0.3, 1);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 8px;
+      font-weight: bold;
+      color: white;
+    }
+
+    .seat-cell.available {
+      background: rgba(34, 197, 94, 0.4);
+      border: 1px solid #22c55e;
+      box-shadow: 0 0 4px rgba(34, 197, 94, 0.5);
+    }
+
+    .seat-cell.available:hover {
+      transform: scale(1.15);
+      background: rgba(34, 197, 94, 0.75);
+    }
+
+    .seat-cell.selected {
+      background: #00a8ff !important;
+      border: 1.5px solid #fff !important;
+      color: #fff !important;
+      box-shadow: 0 0 10px #00a8ff, 0 0 18px rgba(0, 168, 255, 0.6) !important;
+      transform: scale(1.18);
+      z-index: 5;
+      animation: seat-pulse 1.8s infinite ease-in-out;
+    }
+
+    @keyframes seat-pulse {
+      0%, 100% { box-shadow: 0 0 8px #00a8ff; }
+      50% { box-shadow: 0 0 16px #00a8ff, 0 0 24px rgba(0, 168, 255, 0.8); }
+    }
+
+    .seat-cell.occupied {
+      background: transparent;
+      cursor: not-allowed;
+    }
+
+    .seat-cell.occupied:hover {
+      border: 1px dashed rgba(239, 68, 68, 0.6);
+      background: rgba(239, 68, 68, 0.2);
+    }
+
+    /* Live Summary Bar Overlays */
+    .dynamic-hud-bar {
+      background: rgba(18, 22, 34, 0.94);
+      border: 1px solid rgba(229, 9, 20, 0.5);
+      border-radius: 12px;
+      padding: 8px 12px;
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+      box-shadow: 0 8px 25px rgba(0, 0, 0, 0.8), 0 0 15px rgba(229, 9, 20, 0.25);
+      backdrop-filter: blur(10px);
+      -webkit-backdrop-filter: blur(10px);
+    }
+
+    .hud-title-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-size: 10px;
+      color: var(--text-muted);
+    }
+
+    .hud-badge-ok {
+      background: rgba(34, 197, 94, 0.2);
+      color: #22c55e;
+      border: 1px solid rgba(34, 197, 94, 0.4);
+      padding: 2px 6px;
+      border-radius: 4px;
+      font-size: 9px;
+      font-weight: 700;
+    }
+
+    .hud-price-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: baseline;
+    }
+
+    .hud-price-main {
+      font-size: 15px;
+      font-weight: 800;
+      color: #fff;
+    }
+
+    .hud-price-sub {
+      font-size: 10px;
+      color: var(--text-muted);
+    }
+
+    .hud-action-btn {
+      background: linear-gradient(135deg, #e50914, #b20710);
+      color: #fff;
+      border: none;
+      border-radius: 8px;
+      padding: 8px 12px;
+      font-size: 12px;
+      font-weight: 700;
+      cursor: pointer;
+      text-align: center;
+      box-shadow: 0 4px 15px var(--accent-glow);
+      transition: all 0.2s ease;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+    }
+
+    .hud-action-btn:hover {
+      filter: brightness(1.15);
+      transform: translateY(-1px);
+    }
+
+    .hud-action-btn:active {
+      transform: translateY(1px);
+    }
+
+    .hud-action-btn:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+      filter: grayscale(0.8);
+    }
+
+    /* Dulceria Stepper Buttons */
+    .stepper-control {
+      display: inline-flex;
+      align-items: center;
+      background: rgba(18, 22, 34, 0.92);
+      border: 1px solid rgba(255, 255, 255, 0.15);
+      border-radius: 6px;
+      overflow: hidden;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.5);
+    }
+
+    .stepper-btn {
+      background: rgba(229, 9, 20, 0.85);
+      border: none;
+      color: #fff;
+      width: 22px;
+      height: 22px;
+      font-size: 13px;
+      font-weight: bold;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: all 0.15s ease;
+    }
+
+    .stepper-btn.minus {
+      background: rgba(255, 255, 255, 0.12);
+      color: #cbd5e1;
+    }
+
+    .stepper-btn.minus:hover {
+      background: rgba(255, 255, 255, 0.25);
+    }
+
+    .stepper-btn.plus:hover {
+      background: #e50914;
+      box-shadow: 0 0 8px rgba(229, 9, 20, 0.6);
+    }
+
+    .stepper-qty {
+      padding: 0 7px;
+      font-size: 11px;
+      font-weight: 700;
+      color: #fff;
+      min-width: 18px;
+      text-align: center;
+    }
+
+    /* Currency Ticker Pill */
+    .currency-pill-btn {
+      background: rgba(34, 197, 94, 0.18);
+      border: 1px solid rgba(34, 197, 94, 0.4);
+      color: #4ade80;
+      padding: 4px 8px;
+      border-radius: 6px;
+      font-size: 9.5px;
+      font-weight: 700;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 5px;
+      transition: all 0.2s ease;
+    }
+
+    .currency-pill-btn:hover {
+      background: rgba(34, 197, 94, 0.3);
+      box-shadow: 0 0 10px rgba(34, 197, 94, 0.3);
+    }
+
+    /* Floating "+1" Animation */
+    .floating-plus-one {
+      position: absolute;
+      color: #22c55e;
+      font-weight: 800;
+      font-size: 14px;
+      pointer-events: none;
+      animation: float-up-fade 0.8s ease-out forwards;
+      text-shadow: 0 0 6px rgba(34, 197, 94, 0.8);
+      z-index: 100;
+    }
+
+    @keyframes float-up-fade {
+      0% { opacity: 1; transform: translateY(0) scale(1); }
+      100% { opacity: 0; transform: translateY(-24px) scale(1.3); }
+    }
+
+    /* Payment Methods Selectors */
+    .payment-pill-btn {
+      background: rgba(255, 255, 255, 0.05);
+      border: 1px solid rgba(255, 255, 255, 0.12);
+      border-radius: 8px;
+      padding: 8px 10px;
+      color: #cbd5e1;
+      font-size: 10.5px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 5px;
+    }
+
+    .payment-pill-btn.selected {
+      background: rgba(34, 197, 94, 0.18);
+      border: 1.5px solid #22c55e;
+      color: #fff;
+      box-shadow: 0 0 12px rgba(34, 197, 94, 0.4);
+    }
+
+    /* Quick Fill Bar for Login */
+    .quick-fill-bar {
+      background: rgba(18, 22, 34, 0.95);
+      border: 1px solid rgba(255, 255, 255, 0.12);
+      border-radius: 10px;
+      padding: 8px;
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+      box-shadow: 0 8px 25px rgba(0, 0, 0, 0.8);
+      backdrop-filter: blur(10px);
+    }
+
+    .quick-fill-title {
+      font-size: 9.5px;
+      color: var(--text-muted);
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .quick-fill-btns {
+      display: flex;
+      gap: 5px;
+    }
+
+    .quick-btn {
+      flex: 1;
+      background: rgba(255, 255, 255, 0.06);
+      border: 1px solid rgba(255, 255, 255, 0.12);
+      color: #fff;
+      padding: 5px 6px;
+      border-radius: 6px;
+      font-size: 9.5px;
+      font-weight: 600;
+      cursor: pointer;
+      text-align: center;
+      transition: all 0.2s;
+    }
+
+    .quick-btn:hover {
+      background: rgba(229, 9, 20, 0.2);
+      border-color: var(--accent);
+      color: #fff;
+    }
+
+    /* Modals inside Phone Viewport */
+    .phone-modal-backdrop {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(5, 7, 12, 0.85);
+      backdrop-filter: blur(8px);
+      -webkit-backdrop-filter: blur(8px);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+      z-index: 80;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.25s ease;
+    }
+
+    .phone-modal-backdrop.open {
+      opacity: 1;
+      pointer-events: auto;
+    }
+
+    .phone-modal-card {
+      background: #141824;
+      border: 1px solid rgba(255, 255, 255, 0.15);
+      border-radius: 18px;
+      width: 90%;
+      max-width: 320px;
+      padding: 20px;
+      box-shadow: 0 20px 50px rgba(0, 0, 0, 0.9), 0 0 30px rgba(229, 9, 20, 0.2);
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+      transform: scale(0.92);
+      transition: transform 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+
+    .phone-modal-backdrop.open .phone-modal-card {
+      transform: scale(1);
+    }
+
+    /* Transbank Modal Specifics */
+    .tb-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+      padding-bottom: 10px;
+    }
+
+    .tb-badge {
+      background: #0070ba;
+      color: #fff;
+      font-size: 10px;
+      font-weight: 800;
+      padding: 3px 8px;
+      border-radius: 4px;
+      letter-spacing: 0.5px;
+    }
+
+    .tb-step-list {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      font-size: 11.5px;
+    }
+
+    .tb-step-item {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      color: var(--text-muted);
+      transition: color 0.3s;
+    }
+
+    .tb-step-item.active {
+      color: #38bdf8;
+      font-weight: 600;
+    }
+
+    .tb-step-item.done {
+      color: #22c55e;
+    }
+
+    .tb-spinner {
+      width: 14px;
+      height: 14px;
+      border: 2px solid rgba(56, 189, 248, 0.2);
+      border-top-color: #38bdf8;
+      border-radius: 50%;
+      animation: spin 0.8s linear infinite;
+    }
+
+    @keyframes spin {
+      to { transform: rotate(360deg); }
+    }
+
+    /* Thermal Ticket Receipt Animation */
+    .thermal-receipt-container {
+      position: absolute;
+      top: 0;
+      left: 10%;
+      width: 80%;
+      background: #ffffff;
+      color: #111827;
+      border-radius: 0 0 12px 12px;
+      box-shadow: 0 20px 60px rgba(0, 0, 0, 0.95), 0 0 25px rgba(255, 255, 255, 0.3);
+      padding: 16px 14px 20px;
+      font-family: 'Courier New', Courier, monospace;
+      font-size: 10px;
+      line-height: 1.4;
+      z-index: 95;
+      transform: translateY(-110%);
+      transition: transform 0.6s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+
+    .thermal-receipt-container.sliding-out {
+      transform: translateY(0);
+    }
+
+    .receipt-perforation {
+      border-bottom: 2px dashed #9ca3af;
+      margin: 8px 0;
+    }
+
+    .receipt-barcode {
+      height: 32px;
+      background: repeating-linear-gradient(
+        90deg,
+        #111 0px,
+        #111 2px,
+        transparent 2px,
+        transparent 4px,
+        #111 4px,
+        #111 7px,
+        transparent 7px,
+        transparent 9px
+      );
+      margin: 10px 0 6px;
+    }
+
     /* Floating Toast Notifications */
     .toast-container {
       position: fixed;
@@ -256,47 +782,41 @@
     }
 
     .toast {
-      background: rgba(18, 22, 34, 0.95);
+      background: rgba(18, 22, 34, 0.96);
       border: 1px solid rgba(255, 255, 255, 0.15);
       color: #fff;
       padding: 10px 18px;
       border-radius: 10px;
-      font-size: 13px;
-      box-shadow: 0 12px 30px rgba(0, 0, 0, 0.6);
+      font-size: 12.5px;
+      box-shadow: 0 12px 30px rgba(0, 0, 0, 0.7);
       backdrop-filter: blur(8px);
       display: flex;
       align-items: center;
-      gap: 10px;
+      gap: 8px;
       animation: toast-in 0.25s ease-out forwards;
     }
 
     @keyframes toast-in {
-      from {
-        opacity: 0;
-        transform: translateY(12px);
-      }
-      to {
-        opacity: 1;
-        transform: translateY(0);
-      }
+      from { opacity: 0; transform: translateY(12px); }
+      to { opacity: 1; transform: translateY(0); }
     }
 
     /* Flow Scenario Quick Panel */
     .scenario-drawer {
       position: fixed;
-      right: -320px;
-      top: 60px;
-      width: 320px;
-      height: calc(100vh - 60px);
-      background: rgba(15, 19, 30, 0.96);
+      right: -330px;
+      top: 54px;
+      width: 330px;
+      height: calc(100vh - 54px);
+      background: rgba(15, 19, 30, 0.97);
       border-left: 1px solid rgba(255, 255, 255, 0.1);
       backdrop-filter: blur(15px);
       z-index: 90;
       transition: right 0.3s cubic-bezier(0.16, 1, 0.3, 1);
-      padding: 20px;
+      padding: 18px;
       display: flex;
       flex-direction: column;
-      gap: 16px;
+      gap: 14px;
       overflow-y: auto;
     }
 
@@ -309,12 +829,12 @@
       display: flex;
       align-items: center;
       justify-content: space-between;
-      padding-bottom: 12px;
+      padding-bottom: 10px;
       border-bottom: 1px solid rgba(255, 255, 255, 0.1);
     }
 
     .drawer-header h3 {
-      font-size: 14px;
+      font-size: 13.5px;
       color: #fff;
       font-weight: 600;
     }
@@ -343,7 +863,7 @@
     }
 
     .scenario-card h4 {
-      font-size: 13px;
+      font-size: 12.5px;
       margin-bottom: 4px;
       color: #fff;
       display: flex;
@@ -380,7 +900,7 @@
 
     /* Print styling */
     @media print {
-      header, .scenario-drawer, .toast-container, .controls {
+      header, .scenario-drawer, .toast-container, .controls, .flow-stepper {
         display: none !important;
       }
       body, main {
@@ -402,8 +922,19 @@
   <header>
     <div class="brand">
       <div class="logo-badge">CineApp</div>
-      <h1>Prototipo Interactivo <span>| Metodología de Desarrollo</span></h1>
+      <h1>Prototipo Interactivo <span>| Metodología</span></h1>
     </div>
+
+    <!-- Stepper Navigation -->
+    <nav class="flow-stepper" id="flowStepper">
+      <div class="step-chip active" data-step="01" onclick="goToScreen('01')"><span class="step-num">1</span> Login</div>
+      <div class="step-chip" data-step="06" onclick="goToScreen('06')"><span class="step-num">2</span> Cartelera</div>
+      <div class="step-chip" data-step="07" onclick="goToScreen('07')"><span class="step-num">3</span> Butacas</div>
+      <div class="step-chip" data-step="08" onclick="goToScreen('08')"><span class="step-num">4</span> +18 Legal</div>
+      <div class="step-chip" data-step="10" onclick="goToScreen('10')"><span class="step-num">5</span> Dulcería</div>
+      <div class="step-chip" data-step="11" onclick="goToScreen('11')"><span class="step-num">6</span> Carro</div>
+      <div class="step-chip" data-step="12" onclick="goToScreen('12')"><span class="step-num">7</span> Boleta</div>
+    </nav>
 
     <div class="controls">
       <!-- Screen Dropdown Selector -->
@@ -411,17 +942,22 @@
         <!-- Populated via JS -->
       </select>
 
+      <!-- Sound Mute/Unmute -->
+      <button id="soundToggleBtn" class="btn" title="Activar/Silenciar Efectos de Sonido">
+        <span id="soundIcon">🔊</span>
+      </button>
+
       <!-- Hotspot Hints Toggle -->
       <button id="toggleHintsBtn" class="btn" title="Atajo: Tecla H">
-        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
           <path d="M9 18h6M10 22h4M12 2a7 7 0 0 0-7 7c0 2.38 1.19 4.47 3 5.74V17a1 1 0 0 0 1 1h6a1 1 0 0 0 1-1v-2.26c1.81-1.27 3-3.36 3-5.74a7 7 0 0 0-7-7z"/>
         </svg>
-        <span>Mostrar Pistas</span>
+        <span>Pistas</span>
       </button>
 
       <!-- Scenarios Drawer Button -->
       <button id="toggleScenariosBtn" class="btn">
-        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
           <line x1="8" y1="6" x2="21" y2="6"></line>
           <line x1="8" y1="12" x2="21" y2="12"></line>
           <line x1="8" y1="18" x2="21" y2="18"></line>
@@ -429,12 +965,12 @@
           <line x1="3" y1="12" x2="3.01" y2="12"></line>
           <line x1="3" y1="18" x2="3.01" y2="18"></line>
         </svg>
-        <span>Flujos / Casos</span>
+        <span>Casos</span>
       </button>
 
       <!-- Fullscreen Button -->
       <button id="fullscreenBtn" class="btn" title="Pantalla completa">
-        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
           <path d="M8 3H5a2 2 0 0 0-2 2v3m18 0V5a2 2 0 0 0-2-2h-3m0 18h3a2 2 0 0 0 2-2v-3M3 16v3a2 2 0 0 0 2 2h3"/>
         </svg>
       </button>
@@ -449,6 +985,95 @@
 
       <!-- Hotspot Interactive Layer -->
       <div class="hotspots-layer" id="hotspotsLayer"></div>
+
+      <!-- Dynamic Interactive Widgets Layer -->
+      <div class="interactive-layer" id="interactiveLayer"></div>
+
+      <!-- Transbank Terminal Simulation Modal -->
+      <div class="phone-modal-backdrop" id="transbankModal">
+        <div class="phone-modal-card">
+          <div class="tb-header">
+            <span class="tb-badge">Transbank Webpay</span>
+            <span style="font-size:10px; color:#94a3b8;">Terminal #84210</span>
+          </div>
+          <div style="text-align: center; padding: 6px 0;">
+            <div style="font-size: 11px; color: #94a3b8;">Monto a Cobrar</div>
+            <div id="tbAmountDisplay" style="font-size: 20px; font-weight: 800; color: #fff;">$24.730 CLP</div>
+            <div style="font-size: 10px; color: #38bdf8; margin-top: 3px;">💳 Tarjeta Débito RedCompra (**** 5489)</div>
+          </div>
+          <div class="tb-step-list">
+            <div class="tb-step-item active" id="tbStep1">
+              <div class="tb-spinner" id="tbSpin1"></div>
+              <span>1. Conectando con servidor seguro...</span>
+            </div>
+            <div class="tb-step-item" id="tbStep2">
+              <span id="tbIcon2">⏳</span>
+              <span>2. Validando chip EMV y autorización...</span>
+            </div>
+            <div class="tb-step-item" id="tbStep3">
+              <span id="tbIcon3">⏳</span>
+              <span>3. Aprobación bancaria recibida</span>
+            </div>
+          </div>
+          <div style="text-align: center; font-size: 9.5px; color: #64748b; margin-top: 4px;">
+            🔒 Transacción encriptada RSA-2048
+          </div>
+        </div>
+      </div>
+
+      <!-- QR Code Enlarge Modal -->
+      <div class="phone-modal-backdrop" id="qrModal">
+        <div class="phone-modal-card" style="text-align:center;">
+          <div style="font-size:13px; font-weight:700; color:#fff;">Entrada Digital & Comprobante</div>
+          <div style="background:#fff; padding:16px; border-radius:12px; margin:8px auto; width:170px; height:170px; display:flex; flex-direction:column; align-items:center; justify-content:center; box-shadow:0 0 20px rgba(255,255,255,0.4); position:relative; overflow:hidden;">
+            <!-- QR code graphic with simulated laser scan -->
+            <div style="width:100%; height:100%; background:repeating-linear-gradient(0deg,#111 0px,#111 6px,transparent 6px,transparent 12px), repeating-linear-gradient(90deg,#111 0px,#111 6px,transparent 6px,transparent 12px); border-radius:6px; opacity:0.85;"></div>
+            <div style="position:absolute; top:0; left:0; right:0; height:3px; background:#22c55e; box-shadow:0 0 10px #22c55e; animation:laser-scan 1.6s ease-in-out infinite alternate;"></div>
+          </div>
+          <div style="font-size:11px; color:#22c55e; font-weight:700;">✓ QR VÁLIDO Y SINCRONIZADO</div>
+          <div style="font-size:10px; color:#94a3b8;" id="qrSeatsLabel">Butacas: C5, C6 | Acceso Sala 3</div>
+          <button class="hud-action-btn" onclick="closeQrModal()" style="margin-top:6px; padding:6px 14px;">Cerrar Lector</button>
+        </div>
+      </div>
+
+      <!-- Thermal Receipt Slip -->
+      <div class="thermal-receipt-container" id="thermalReceipt">
+        <div style="text-align:center;">
+          <strong style="font-size:12px;">CineApp Chile S.p.A.</strong><br>
+          RUT: 77.123.456-7<br>
+          Av. Vicuña Mackenna 465, Santiago<br>
+          Caja 02 (Transbank #84210)
+        </div>
+        <div class="receipt-perforation"></div>
+        <div>
+          FOLIO UNIFICADO: <strong id="receiptFolio">#CIN-2026-08942</strong><br>
+          FECHA: <span id="receiptDate">15/10/2026 14:45 hrs</span><br>
+          ATENDIÓ: Débora S. (Cajero Mixto)
+        </div>
+        <div class="receipt-perforation"></div>
+        <div id="receiptItemsList">
+          <!-- Populated dynamically -->
+        </div>
+        <div class="receipt-perforation"></div>
+        <div style="display:flex; justify-content:space-between; font-weight:bold; font-size:11px;">
+          <span>TOTAL PAGADO:</span>
+          <span id="receiptTotal">$24.730 CLP</span>
+        </div>
+        <div style="font-size:8.5px; color:#4b5563; margin-top:2px;">
+          MEDIO DE PAGO: Débito RedCompra<br>
+          AUTORIZACIÓN: TB-894210 (APROBADO)
+        </div>
+        <div class="receipt-barcode"></div>
+        <div style="text-align:center; font-size:8px; color:#6b7280;">
+          *** VALE ELECTRÓNICO TRIBUTARIO SII ***<br>
+          ¡Gracias por tu preferencia!
+        </div>
+        <div style="display:flex; gap:6px; margin-top:8px;">
+          <button onclick="window.print()" style="flex:1; background:#111827; color:#fff; border:none; padding:6px; border-radius:4px; font-size:9.5px; cursor:pointer;">Imprimir PDF</button>
+          <button onclick="closeReceipt()" style="flex:1; background:#e5e7eb; color:#111; border:none; padding:6px; border-radius:4px; font-size:9.5px; cursor:pointer;">Cerrar</button>
+        </div>
+      </div>
+
     </div>
   </main>
 
@@ -465,10 +1090,10 @@
       <div class="scenario-steps">
         <div class="scenario-step">1. Iniciar sesión institucional</div>
         <div class="scenario-step">2. Seleccionar función en Cartelera</div>
-        <div class="scenario-step">3. Elegir butacas C5 y C6</div>
+        <div class="scenario-step">3. Elegir butacas interactivas en Mapa</div>
         <div class="scenario-step">4. Validación de edad (+18)</div>
         <div class="scenario-step">5. Agregar confitería (USD/CLP)</div>
-        <div class="scenario-step">6. Pago y comprobante unificado</div>
+        <div class="scenario-step">6. Pasarela Transbank y Comprobante</div>
       </div>
     </div>
 
@@ -482,8 +1107,8 @@
     </div>
 
     <div class="scenario-card" onclick="goToScreen('05')">
-      <h4>🔑 Flujo 3: Recuperación de Clave</h4>
-      <p>Restablecimiento de contraseña con código OTP de 6 dígitos validado.</p>
+      <h4>🔑 Flujo 3: Recuperación de Clave (OTP)</h4>
+      <p>Restablecimiento de contraseña con código OTP de 6 dígitos interactivo.</p>
     </div>
 
     <div class="scenario-card" onclick="goToScreen('09')">
@@ -493,27 +1118,94 @@
 
     <div class="scenario-card" onclick="goToScreen('12')">
       <h4>🧾 Flujo 5: Comprobante y Cierre</h4>
-      <p>Folio unificado tributario, códigos de entrada QR y despacho térmico de tickets.</p>
+      <p>Folio unificado tributario, código QR interactivo y ticket térmico animado.</p>
     </div>
   </aside>
 
   <!-- Floating Toast Notifications -->
   <div class="toast-container" id="toastContainer"></div>
 
+  <style>
+    @keyframes laser-scan {
+      0% { top: 6%; }
+      100% { top: 92%; }
+    }
+  </style>
+
   <script>
-    // Audio synthesizer for native tactical clicks
-    const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-    function playTapSound(type = 'click') {
+    // State Store
+    const appState = {
+      movie: "Oppenheimer",
+      format: "3D Digital",
+      room: "Sala 3 (3D)",
+      time: "20:15",
+      ticketPrice: 6000,
+      usdRate: 940,
+      currency: "CLP",
+      // Seats currently selected (C5 and C6 pre-selected)
+      selectedSeats: ["C5", "C6"],
+      // Snack items
+      snacks: {
+        comboMega: { name: "Combo Mega Popcorn", priceClp: 8500, priceUsd: 9.04, qty: 1 },
+        comboPareja: { name: "Combo Pareja Cine", priceClp: 11500, priceUsd: 12.23, qty: 0 },
+        bebida32: { name: "Bebida Grande 32oz", priceClp: 3200, priceUsd: 3.40, qty: 0 },
+        nachos: { name: "Nachos con Queso Cheddar", priceClp: 4900, priceUsd: 5.21, qty: 0 },
+        chocolates: { name: "Chocolates Suizos (USD)", priceClp: 4230, priceUsd: 4.50, qty: 1 },
+        gomitas: { name: "Gomitas Ácidas USA (USD)", priceClp: 2820, priceUsd: 3.00, qty: 0 }
+      },
+      paymentMethod: "debito",
+      discountApplied: false,
+      soundEnabled: true,
+      currentUser: "Débora Sepúlveda (Cajero Mixto)"
+    };
+
+    // Calculate totals helper
+    function getTotals() {
+      const ticketsSubtotal = appState.selectedSeats.length * appState.ticketPrice;
+      let snacksSubtotal = 0;
+      Object.values(appState.snacks).forEach(s => {
+        snacksSubtotal += s.priceClp * s.qty;
+      });
+
+      let subtotal = ticketsSubtotal + snacksSubtotal;
+      let discount = appState.discountApplied ? Math.round(subtotal * 0.20) : 0;
+      let total = Math.max(0, subtotal - discount);
+      let iva = Math.round(total * 0.19 / 1.19);
+      let totalUsd = (total / appState.usdRate).toFixed(2);
+
+      return {
+        ticketsSubtotal,
+        snacksSubtotal,
+        discount,
+        subtotal,
+        total,
+        iva,
+        totalUsd
+      };
+    }
+
+    // Sound Synthesizer (Zero dependencies Web Audio API)
+    let audioCtx = null;
+    function initAudio() {
+      if (!audioCtx) {
+        audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+      }
+      if (audioCtx && audioCtx.state === 'suspended') {
+        audioCtx.resume();
+      }
+    }
+
+    function playSound(type = 'click') {
+      if (!appState.soundEnabled) return;
       try {
-        if (audioCtx.state === 'suspended') {
-          audioCtx.resume();
-        }
+        initAudio();
+        if (!audioCtx) return;
+        const now = audioCtx.currentTime;
         const osc = audioCtx.createOscillator();
         const gain = audioCtx.createGain();
         osc.connect(gain);
         gain.connect(audioCtx.destination);
 
-        const now = audioCtx.currentTime;
         if (type === 'click') {
           osc.frequency.setValueAtTime(800, now);
           osc.frequency.exponentialRampToValueAtTime(350, now + 0.04);
@@ -521,32 +1213,62 @@
           gain.gain.exponentialRampToValueAtTime(0.01, now + 0.04);
           osc.start(now);
           osc.stop(now + 0.04);
-        } else if (type === 'success') {
-          osc.frequency.setValueAtTime(520, now);
-          osc.frequency.exponentialRampToValueAtTime(880, now + 0.09);
+        } else if (type === 'seat') {
+          osc.type = 'sine';
+          osc.frequency.setValueAtTime(440, now);
+          osc.frequency.exponentialRampToValueAtTime(720, now + 0.07);
           gain.gain.setValueAtTime(0.15, now);
-          gain.gain.exponentialRampToValueAtTime(0.01, now + 0.09);
+          gain.gain.exponentialRampToValueAtTime(0.01, now + 0.07);
           osc.start(now);
-          osc.stop(now + 0.09);
+          osc.stop(now + 0.07);
+        } else if (type === 'snack') {
+          osc.type = 'triangle';
+          osc.frequency.setValueAtTime(587.33, now); // D5
+          osc.frequency.setValueAtTime(880, now + 0.04); // A5
+          gain.gain.setValueAtTime(0.14, now);
+          gain.gain.exponentialRampToValueAtTime(0.01, now + 0.10);
+          osc.start(now);
+          osc.stop(now + 0.10);
+        } else if (type === 'success') {
+          osc.type = 'sine';
+          osc.frequency.setValueAtTime(523.25, now); // C5
+          osc.frequency.setValueAtTime(659.25, now + 0.06); // E5
+          osc.frequency.setValueAtTime(783.99, now + 0.12); // G5
+          gain.gain.setValueAtTime(0.18, now);
+          gain.gain.exponentialRampToValueAtTime(0.01, now + 0.22);
+          osc.start(now);
+          osc.stop(now + 0.22);
+        } else if (type === 'error') {
+          osc.type = 'sawtooth';
+          osc.frequency.setValueAtTime(180, now);
+          osc.frequency.setValueAtTime(140, now + 0.08);
+          gain.gain.setValueAtTime(0.15, now);
+          gain.gain.exponentialRampToValueAtTime(0.01, now + 0.16);
+          osc.start(now);
+          osc.stop(now + 0.16);
+        } else if (type === 'print') {
+          // Soft mechanical thermal buzz
+          osc.type = 'square';
+          osc.frequency.setValueAtTime(120, now);
+          gain.gain.setValueAtTime(0.06, now);
+          gain.gain.exponentialRampToValueAtTime(0.001, now + 0.35);
+          osc.start(now);
+          osc.stop(now + 0.35);
         }
-      } catch(e) {}
+      } catch (e) {}
     }
 
-    // Screens metadata definition (all images: 768 x 1376)
+    // Screens Definition
     const screens = {
       "01": {
         id: "01",
         name: "01. Login (Blanco)",
         file: "Mockup_01_Login_Blanco.png",
         hotspots: [
-          // Campo Correo o Contraseña -> Salta a datos validados
           { left: 16.9, top: 44.7, width: 66.2, height: 4.8, title: "Escribir credenciales", target: "02" },
           { left: 16.9, top: 51.6, width: 66.2, height: 4.8, title: "Escribir contraseña", target: "02" },
-          // ¿Olvidaste tu contraseña? -> Recuperar contraseña
           { left: 34.0, top: 62.3, width: 32.0, height: 2.8, title: "¿Olvidaste tu contraseña?", target: "05" },
-          // Simular error de credenciales con clic en el logo
-          { left: 34.0, top: 30.0, width: 32.0, height: 5.0, title: "Test: Simular error", target: "04" },
-          // Crear cuenta
+          { left: 34.0, top: 30.0, width: 32.0, height: 5.0, title: "Simular error de login", target: "04" },
           { left: 16.9, top: 65.8, width: 66.2, height: 4.0, title: "Crear una cuenta", action: () => showToast("ℹ️ Creación de cuenta restringida a Administrador") }
         ]
       },
@@ -555,13 +1277,9 @@
         name: "02. Login (Datos Validados)",
         file: "Mockup_02_Login_Datos_Validados.png",
         hotspots: [
-          // Botón Iniciar Sesión (Rojo Activo)
           { left: 16.9, top: 57.7, width: 66.2, height: 4.2, title: "Iniciar Sesión", target: "03", sound: 'success' },
-          // ¿Olvidaste tu contraseña?
           { left: 34.0, top: 62.3, width: 32.0, height: 2.8, title: "¿Olvidaste tu contraseña?", target: "05" },
-          // Ojo / Borrar contraseña -> Vuelve a blanco
           { left: 75.0, top: 52.0, width: 8.0, height: 4.0, title: "Limpiar campo", target: "01" },
-          // Logo superior -> Probar credenciales erróneas
           { left: 34.0, top: 30.0, width: 32.0, height: 5.0, title: "Simular error de login", target: "04" }
         ]
       },
@@ -570,7 +1288,6 @@
         name: "03. Login Exitoso (Modal)",
         file: "Mockup_03_Login_Exitoso.png",
         hotspots: [
-          // Botón Entrar al Sistema (Verde)
           { left: 17.0, top: 64.0, width: 66.0, height: 4.6, title: "Entrar al Sistema", target: "06", sound: 'success' }
         ]
       },
@@ -579,9 +1296,7 @@
         name: "04. Login Error Credenciales",
         file: "Mockup_04_Login_Error_Credenciales.png",
         hotspots: [
-          // Botón Reintentar Inicio de Sesión
           { left: 17.0, top: 55.5, width: 66.0, height: 4.2, title: "Reintentar Inicio de Sesión", target: "02" },
-          // ¿Olvidaste tu contraseña? Restablécela aquí
           { left: 17.0, top: 61.0, width: 66.0, height: 3.8, title: "Restablecer contraseña", target: "05" }
         ]
       },
@@ -590,9 +1305,7 @@
         name: "05. Recuperar Contraseña",
         file: "Mockup_05_Recuperar_Contrasena.png",
         hotspots: [
-          // Flecha volver atrás
           { left: 15.6, top: 11.2, width: 8.0, height: 4.2, title: "Volver atrás", target: "01" },
-          // Botón Guardar y Volver a Iniciar Sesión
           { left: 16.9, top: 49.8, width: 66.2, height: 4.2, title: "Guardar y Volver a Iniciar Sesión", target: "02", action: () => showToast("✅ Contraseña actualizada correctamente", 3000) }
         ]
       },
@@ -601,16 +1314,7 @@
         name: "06. Cartelera y Formatos",
         file: "Mockup_06_Cartelera_Funciones_Formatos.png",
         hotspots: [
-          // Botón rojo Seleccionar Asientos y Validar Aforo
           { left: 15.9, top: 82.0, width: 68.2, height: 3.6, title: "Seleccionar Asientos y Validar Aforo", target: "07", sound: 'success' },
-          // Formatos de Sala
-          { left: 17.0, top: 38.8, width: 23.0, height: 5.5, title: "2D Tradicional", action: () => showToast("Formato 2D seleccionado") },
-          { left: 40.5, top: 38.8, width: 23.0, height: 5.5, title: "3D Digital (Seleccionado)", action: () => showToast("Sala 3D Digital activa") },
-          { left: 64.0, top: 38.8, width: 23.0, height: 5.5, title: "Sala VIP", action: () => showToast("Sala VIP seleccionada") },
-          // Otras películas: The Batman (+14) -> Probar pantalla de reglas de negocio
-          { left: 51.0, top: 62.8, width: 33.0, height: 4.6, title: "The Batman (+14) - Ver bloqueo", target: "09" },
-          { left: 17.0, top: 62.8, width: 33.0, height: 4.6, title: "Dune: Parte 2", action: () => showToast("Película: Dune Parte 2") },
-          // Barra inferior de navegación
           ...getBottomNavHotspots()
         ]
       },
@@ -619,13 +1323,7 @@
         name: "07. Mapa de Asientos",
         file: "Mockup_07_Mapa_Asientos_Aforo.png",
         hotspots: [
-          // Flecha volver
           { left: 15.6, top: 11.2, width: 8.0, height: 4.2, title: "Volver a Cartelera", target: "06" },
-          // Botón Continuar al Pago / Dulcería -> Pasa al filtro legal +18
-          { left: 17.7, top: 81.4, width: 64.3, height: 3.4, title: "Continuar al Pago / Dulcería", target: "08" },
-          // Área de butacas (interactiva)
-          { left: 26.0, top: 37.0, width: 48.0, height: 21.0, title: "Butacas C5, C6 seleccionadas", action: () => showToast("🎟️ Butacas C5 y C6 asignadas ($12.000 CLP)") },
-          // Barra inferior de navegación
           ...getBottomNavHotspots()
         ]
       },
@@ -634,13 +1332,9 @@
         name: "08. Modal Restricción Edad (+18)",
         file: "Mockup_08_Modal_Restriccion_Edad.png",
         hotspots: [
-          // Botón Confirmar y Continuar Venta -> Pasa a Dulcería
           { left: 18.2, top: 56.7, width: 63.5, height: 3.8, title: "Confirmar y Continuar Venta", target: "10", sound: 'success' },
-          // Cancelar Transacción -> Vuelve al mapa de asientos
           { left: 34.0, top: 61.2, width: 32.0, height: 2.8, title: "Cancelar Transacción", target: "07" },
-          // Clic en el círculo +18 -> Simular bloqueo por edad insuficiente
           { left: 44.0, top: 24.5, width: 12.0, height: 6.8, title: "Simular error de edad (-18)", target: "09" },
-          // Barra inferior de navegación
           ...getBottomNavHotspots()
         ]
       },
@@ -649,11 +1343,8 @@
         name: "09. Bloqueos y Reglas de Negocio",
         file: "Mockup_09_Mensaje_Bloqueo_Aforo_Edad.png",
         hotspots: [
-          // Botón Seleccionar Otra Función o Sala
           { left: 15.9, top: 78.5, width: 68.2, height: 3.5, title: "Seleccionar Otra Función o Sala", target: "06" },
-          // Volver al Menú Principal
           { left: 15.9, top: 82.5, width: 68.2, height: 3.1, title: "Volver a Cartelera", target: "06" },
-          // Barra inferior de navegación
           ...getBottomNavHotspots()
         ]
       },
@@ -662,13 +1353,6 @@
         name: "10. Dulcería (Conversión USD/CLP)",
         file: "Mockup_10_Dulceria_Conversion_USD_CLP.png",
         hotspots: [
-          // Botón Agregar al Carro y Continuar
-          { left: 17.4, top: 81.4, width: 64.8, height: 3.4, title: "Agregar al Carro y Continuar", target: "11", sound: 'success' },
-          // Botones + y - de confitería
-          { left: 74.0, top: 22.0, width: 7.5, height: 2.8, title: "+ Combo Mega", action: () => showToast("🍿 Combo Mega Popcorn ($8.500 CLP)") },
-          { left: 74.0, top: 32.4, width: 7.5, height: 2.8, title: "+ Bebida 32oz", action: () => showToast("🥤 Bebida Grande 32oz ($3.200 CLP)") },
-          { left: 74.0, top: 42.6, width: 7.5, height: 2.8, title: "+ Chocolates USD", action: () => showToast("🍫 Chocolates Suizos ($4.50 USD = $4.230 CLP)") },
-          // Barra inferior de navegación
           ...getBottomNavHotspots()
         ]
       },
@@ -677,13 +1361,6 @@
         name: "11. Carro Venta Combinada",
         file: "Mockup_11_Carro_Venta_Combinada.png",
         hotspots: [
-          // Botón Confirmar Pago y Emitir Comprobante
-          { left: 15.9, top: 82.1, width: 68.2, height: 3.5, title: "Confirmar Pago y Emitir Comprobante", target: "12", sound: 'success' },
-          // Selección de métodos de pago
-          { left: 16.0, top: 68.0, width: 22.0, height: 3.5, title: "Débito RedCompra (Seleccionado)", action: () => showToast("💳 Pago con Débito seleccionado") },
-          { left: 39.0, top: 68.0, width: 22.0, height: 3.5, title: "Crédito Bancario", action: () => showToast("💳 Tarjeta de Crédito seleccionada") },
-          { left: 62.0, top: 68.0, width: 22.0, height: 3.5, title: "Efectivo", action: () => showToast("💵 Pago en Efectivo seleccionado") },
-          // Barra inferior de navegación
           ...getBottomNavHotspots()
         ]
       },
@@ -692,21 +1369,12 @@
         name: "12. Comprobante Folio Unificado",
         file: "Mockup_12_Comprobante_Folio_Unificado.png",
         hotspots: [
-          // Botón Imprimir Ticket
-          { 
-            left: 15.9, top: 87.2, width: 33.2, height: 3.3, title: "Imprimir Ticket", 
-            action: () => {
-              showToast("🖨️ Enviando ticket térmico #CIN-2026-08942 a Caja 02...", 3500);
-              setTimeout(() => window.print(), 600);
-            } 
-          },
-          // Botón Nueva Venta
-          { left: 50.8, top: 87.2, width: 33.2, height: 3.3, title: "Iniciar Nueva Venta", target: "06", sound: 'success' }
+          { left: 15.9, top: 87.2, width: 33.2, height: 3.3, title: "Imprimir Ticket", action: () => triggerThermalPrint() },
+          { left: 50.8, top: 87.2, width: 33.2, height: 3.3, title: "Iniciar Nueva Venta", action: () => startNewSale(), sound: 'success' }
         ]
       }
     };
 
-    // Helper for common bottom navigation bar
     function getBottomNavHotspots() {
       return [
         { left: 15.5, top: 86.8, width: 13.8, height: 4.5, title: "Inicio", target: "06" },
@@ -724,16 +1392,21 @@
     const viewport = document.getElementById('viewport');
     const screensContainer = document.getElementById('screensContainer');
     const hotspotsLayer = document.getElementById('hotspotsLayer');
+    const interactiveLayer = document.getElementById('interactiveLayer');
     const screenSelect = document.getElementById('screenSelect');
     const toggleHintsBtn = document.getElementById('toggleHintsBtn');
     const toggleScenariosBtn = document.getElementById('toggleScenariosBtn');
     const scenarioDrawer = document.getElementById('scenarioDrawer');
     const closeDrawerBtn = document.getElementById('closeDrawerBtn');
     const fullscreenBtn = document.getElementById('fullscreenBtn');
+    const soundToggleBtn = document.getElementById('soundToggleBtn');
+    const soundIcon = document.getElementById('soundIcon');
+    const transbankModal = document.getElementById('transbankModal');
+    const qrModal = document.getElementById('qrModal');
+    const thermalReceipt = document.getElementById('thermalReceipt');
 
-    // Initialize screens and dropdown
     function init() {
-      // Create img elements
+      // Create image elements
       Object.values(screens).forEach((s) => {
         const img = document.createElement('img');
         img.src = s.file;
@@ -742,14 +1415,12 @@
         img.className = 'screen-img';
         screensContainer.appendChild(img);
 
-        // Populate dropdown
         const opt = document.createElement('option');
         opt.value = s.id;
         opt.textContent = s.name;
         screenSelect.appendChild(opt);
       });
 
-      // Show initial screen
       goToScreen("01", false);
 
       // Event Listeners
@@ -757,6 +1428,13 @@
       toggleHintsBtn.addEventListener('click', toggleHints);
       toggleScenariosBtn.addEventListener('click', () => scenarioDrawer.classList.toggle('open'));
       closeDrawerBtn.addEventListener('click', () => scenarioDrawer.classList.remove('open'));
+
+      soundToggleBtn.addEventListener('click', () => {
+        appState.soundEnabled = !appState.soundEnabled;
+        soundIcon.textContent = appState.soundEnabled ? '🔊' : '🔇';
+        showToast(appState.soundEnabled ? '🔊 Sonidos activados' : '🔇 Sonidos silenciados');
+        if (appState.soundEnabled) playSound('click');
+      });
 
       fullscreenBtn.addEventListener('click', () => {
         if (!document.fullscreenElement) {
@@ -766,7 +1444,6 @@
         }
       });
 
-      // Keyboard shortcuts
       window.addEventListener('keydown', (e) => {
         if (e.key === 'h' || e.key === 'H') {
           toggleHints();
@@ -776,36 +1453,54 @@
           navigatePrev();
         } else if (e.key === 'Escape') {
           scenarioDrawer.classList.remove('open');
+          closeQrModal();
+          closeReceipt();
         }
       });
 
-      // Clicking empty area inside viewport flashes hints for discovery
       viewport.addEventListener('click', (e) => {
-        if (!e.target.classList.contains('hotspot') && !hintsActive) {
+        if (!e.target.closest('.hotspot') && !e.target.closest('.interactive-widget') && !hintsActive) {
           flashHotspots();
         }
       });
     }
 
-    // Switch screen logic
-    function goToScreen(screenId, playSound = true) {
+    // Switch Screen
+    function goToScreen(screenId, playTap = true) {
       if (!screens[screenId]) return;
 
       currentScreenId = screenId;
       screenSelect.value = screenId;
 
-      // Update active image with smooth transition
+      // Close open modals
+      closeQrModal();
+      closeReceipt();
+      transbankModal.classList.remove('open');
+
+      // Update stepper breadcrumb
+      document.querySelectorAll('.step-chip').forEach(chip => {
+        chip.classList.toggle('active', chip.dataset.step === screenId);
+      });
+
+      // Update screen images
       document.querySelectorAll('.screen-img').forEach(img => img.classList.remove('active'));
       const activeImg = document.getElementById(`img-${screenId}`);
-      if (activeImg) {
-        activeImg.classList.add('active');
+      if (activeImg) activeImg.classList.add('active');
+
+      // Phone shake on error
+      if (screenId === '04') {
+        viewport.classList.add('shake');
+        setTimeout(() => viewport.classList.remove('shake'), 450);
+        playSound('error');
       }
 
-      // Render Hotspots for current screen
+      // Render standard hotspots
       renderHotspots(screenId);
 
-      // Close drawer if opened
-      scenarioDrawer.classList.remove('open');
+      // Render dynamic interactive overlay widgets
+      renderInteractiveWidgets(screenId);
+
+      if (playTap) playSound('click');
     }
 
     function renderHotspots(screenId) {
@@ -825,39 +1520,646 @@
         div.addEventListener('click', (e) => {
           e.stopPropagation();
           createRipple(e, div);
-          playTapSound(h.sound || 'click');
+          playSound(h.sound || 'click');
 
-          if (h.action) {
-            h.action();
-          }
-
-          if (h.target) {
-            setTimeout(() => goToScreen(h.target), 60);
-          }
+          if (h.action) h.action();
+          if (h.target) setTimeout(() => goToScreen(h.target), 60);
         });
 
         hotspotsLayer.appendChild(div);
       });
     }
 
-    // Toggle hint visual overlays
+    // Dynamic Interactive Overlay Widgets for each screen
+    function renderInteractiveWidgets(screenId) {
+      interactiveLayer.innerHTML = '';
+
+      // SCREEN 01: Quick credentials selector
+      if (screenId === '01') {
+        const bar = document.createElement('div');
+        bar.className = 'interactive-widget quick-fill-bar';
+        bar.style.left = '16.9%';
+        bar.style.top = '72.5%';
+        bar.style.width = '66.2%';
+        bar.innerHTML = `
+          <div class="quick-fill-title">
+            <span>⚡ Autocompletar para pruebas</span>
+          </div>
+          <div class="quick-fill-btns">
+            <button class="quick-btn" onclick="quickFillLogin('cajero')">👤 Débora (Cajero)</button>
+            <button class="quick-btn" onclick="quickFillLogin('supervisor')">🛡️ Supervisor</button>
+            <button class="quick-btn" onclick="goToScreen('04')" style="color:#ef4444;">❌ Clave Error</button>
+          </div>
+        `;
+        interactiveLayer.appendChild(bar);
+      }
+
+      // SCREEN 05: OTP Code Inputs
+      else if (screenId === '05') {
+        const otpBar = document.createElement('div');
+        otpBar.className = 'interactive-widget';
+        otpBar.style.left = '17.0%';
+        otpBar.style.top = '36.0%';
+        otpBar.style.width = '66.0%';
+        otpBar.innerHTML = `
+          <div style="background:rgba(18,22,34,0.95); border:1px solid rgba(56,189,248,0.3); border-radius:10px; padding:8px; text-align:center;">
+            <div style="font-size:10px; color:#94a3b8; margin-bottom:5px;">Código de seguridad SMS recibido:</div>
+            <div style="display:flex; justify-content:center; gap:6px;">
+              <span style="background:#0f172a; border:1.5px solid #38bdf8; color:#fff; width:24px; height:28px; display:inline-flex; align-items:center; justify-content:center; border-radius:6px; font-weight:800; font-size:13px;">8</span>
+              <span style="background:#0f172a; border:1.5px solid #38bdf8; color:#fff; width:24px; height:28px; display:inline-flex; align-items:center; justify-content:center; border-radius:6px; font-weight:800; font-size:13px;">4</span>
+              <span style="background:#0f172a; border:1.5px solid #38bdf8; color:#fff; width:24px; height:28px; display:inline-flex; align-items:center; justify-content:center; border-radius:6px; font-weight:800; font-size:13px;">2</span>
+              <span style="background:#0f172a; border:1.5px solid #38bdf8; color:#fff; width:24px; height:28px; display:inline-flex; align-items:center; justify-content:center; border-radius:6px; font-weight:800; font-size:13px;">1</span>
+              <span style="background:#0f172a; border:1.5px solid #38bdf8; color:#fff; width:24px; height:28px; display:inline-flex; align-items:center; justify-content:center; border-radius:6px; font-weight:800; font-size:13px;">0</span>
+              <span style="background:#0f172a; border:1.5px solid #38bdf8; color:#fff; width:24px; height:28px; display:inline-flex; align-items:center; justify-content:center; border-radius:6px; font-weight:800; font-size:13px;">9</span>
+            </div>
+            <div style="font-size:9.5px; color:#22c55e; margin-top:5px; font-weight:600;">✓ Código OTP Autoverificado</div>
+          </div>
+        `;
+        interactiveLayer.appendChild(otpBar);
+      }
+
+      // SCREEN 06: Formats & Schedules Tabs
+      else if (screenId === '06') {
+        // Sala format pills
+        const formatsContainer = document.createElement('div');
+        formatsContainer.className = 'interactive-widget';
+        formatsContainer.style.left = '16.5%';
+        formatsContainer.style.top = '38.5%';
+        formatsContainer.style.width = '67.0%';
+        formatsContainer.style.height = '6.0%';
+        formatsContainer.style.display = 'flex';
+        formatsContainer.style.gap = '2.5%';
+
+        const formats = [
+          { id: '2D', name: '2D Tradicional', price: 4500 },
+          { id: '3D', name: '3D Digital', price: 6000 },
+          { id: 'VIP', name: 'Sala VIP', price: 8500 }
+        ];
+
+        formats.forEach(f => {
+          const btn = document.createElement('div');
+          btn.style.flex = '1';
+          btn.style.cursor = 'pointer';
+          btn.style.borderRadius = '8px';
+          btn.style.transition = 'all 0.2s';
+          if (appState.format.includes(f.id)) {
+            btn.style.border = '2px solid #e50914';
+            btn.style.boxShadow = '0 0 10px rgba(229,9,20,0.5)';
+          }
+          btn.addEventListener('click', () => {
+            appState.format = f.name;
+            appState.ticketPrice = f.price;
+            playSound('click');
+            showToast(`🎟️ Formato cambiado a ${f.name} ($${f.price.toLocaleString('es-CL')} CLP)`);
+            renderInteractiveWidgets('06');
+          });
+          formatsContainer.appendChild(btn);
+        });
+        interactiveLayer.appendChild(formatsContainer);
+
+        // Showtimes pills
+        const showtimesContainer = document.createElement('div');
+        showtimesContainer.className = 'interactive-widget';
+        showtimesContainer.style.left = '16.5%';
+        showtimesContainer.style.top = '51.2%';
+        showtimesContainer.style.width = '67.0%';
+        showtimesContainer.style.height = '5.0%';
+        showtimesContainer.style.display = 'flex';
+        showtimesContainer.style.gap = '2.5%';
+
+        const times = ['17:30', '20:15', '22:45'];
+        times.forEach(t => {
+          const btn = document.createElement('div');
+          btn.style.flex = '1';
+          btn.style.cursor = 'pointer';
+          btn.style.borderRadius = '8px';
+          if (appState.time === t) {
+            btn.style.border = '2px solid #e50914';
+            btn.style.boxShadow = '0 0 8px rgba(229,9,20,0.4)';
+          }
+          btn.addEventListener('click', () => {
+            appState.time = t;
+            playSound('click');
+            showToast(`⏰ Horario seleccionado: ${t} hrs`);
+            renderInteractiveWidgets('06');
+          });
+          showtimesContainer.appendChild(btn);
+        });
+        interactiveLayer.appendChild(showtimesContainer);
+
+        // Blocked movie card (The Batman - Aforo 100%)
+        const batmanCard = document.createElement('div');
+        batmanCard.className = 'interactive-widget';
+        batmanCard.style.left = '51.0%';
+        batmanCard.style.top = '72.0%';
+        batmanCard.style.width = '32.5%';
+        batmanCard.style.height = '4.8%';
+        batmanCard.style.cursor = 'pointer';
+        batmanCard.title = "The Batman (+14) - Sala Llena";
+        batmanCard.addEventListener('click', () => {
+          goToScreen('09');
+          showToast("🚫 Sala 4 (The Batman) al 100% de aforo - Regla RNF-02");
+        });
+        interactiveLayer.appendChild(batmanCard);
+      }
+
+      // SCREEN 07: INTERACTIVE SEATS GRID & LIVE HUD BAR
+      else if (screenId === '07') {
+        const gridBox = document.createElement('div');
+        gridBox.className = 'interactive-widget seat-overlay-grid';
+        gridBox.style.left = '28.0%';
+        gridBox.style.top = '37.8%';
+        gridBox.style.width = '45.0%';
+        gridBox.style.height = '18.2%';
+
+        // Available seat coords based on the mockup image
+        const availableSeatsMap = {
+          "A3": true,
+          "B2": true, "B7": true,
+          "C5": true, "C6": true,
+          "D6": true, "D7": true, "D8": true,
+          "F3": true, "F4": true, "F8": true,
+          "G5": true, "G6": true
+        };
+
+        const rows = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I'];
+        rows.forEach(r => {
+          for (let c = 1; c <= 10; c++) {
+            const seatId = `${r}${c}`;
+            const cell = document.createElement('div');
+            cell.className = 'seat-cell';
+            const isAvail = availableSeatsMap[seatId];
+            const isSelected = appState.selectedSeats.includes(seatId);
+
+            if (isSelected) {
+              cell.classList.add('selected');
+              cell.textContent = seatId;
+            } else if (isAvail) {
+              cell.classList.add('available');
+              cell.textContent = '✓';
+            } else {
+              cell.classList.add('occupied');
+            }
+
+            cell.addEventListener('click', (e) => {
+              e.stopPropagation();
+              if (cell.classList.contains('occupied')) {
+                playSound('error');
+                showToast(`🚫 Butaca ${seatId} ocupada por otro usuario`);
+              } else {
+                toggleSeat(seatId);
+              }
+            });
+
+            gridBox.appendChild(cell);
+          }
+        });
+        interactiveLayer.appendChild(gridBox);
+
+        // Dynamic Live HUD Bar for Screen 07
+        const totals = getTotals();
+        const hud = document.createElement('div');
+        hud.className = 'interactive-widget dynamic-hud-bar';
+        hud.style.left = '16.0%';
+        hud.style.top = '77.2%';
+        hud.style.width = '67.8%';
+
+        hud.innerHTML = `
+          <div class="hud-title-row">
+            <span>${appState.selectedSeats.length} Boletos: <strong style="color:#fff;">${appState.selectedSeats.join(', ') || 'Ninguno'}</strong></span>
+            <span class="hud-badge-ok">Aforo OK (42 Libres)</span>
+          </div>
+          <div class="hud-price-row">
+            <span class="hud-price-main">$${totals.ticketsSubtotal.toLocaleString('es-CL')} CLP</span>
+            <span class="hud-price-sub">~$${(totals.ticketsSubtotal / appState.usdRate).toFixed(2)} USD</span>
+          </div>
+          <button class="hud-action-btn" id="btnContinueFromSeats" ${appState.selectedSeats.length === 0 ? 'disabled' : ''} onclick="goToScreen('08')">
+            Continuar al Pago / Dulcería →
+          </button>
+        `;
+        interactiveLayer.appendChild(hud);
+      }
+
+      // SCREEN 08: Modal Legal Age
+      else if (screenId === '08') {
+        // Quick button to simulate under 18
+        const underageBtn = document.createElement('div');
+        underageBtn.className = 'interactive-widget';
+        underageBtn.style.left = '18.2%';
+        underageBtn.style.top = '65.5%';
+        underageBtn.style.width = '63.5%';
+        underageBtn.style.textAlign = 'center';
+        underageBtn.innerHTML = `
+          <button style="background:rgba(239,68,68,0.15); border:1px solid rgba(239,68,68,0.4); color:#fca5a5; font-size:10.5px; padding:5px 10px; border-radius:6px; cursor:pointer;" onclick="goToScreen('09')">
+            ⚠️ Simular cliente menor de 18 años (Bloqueo Legal)
+          </button>
+        `;
+        interactiveLayer.appendChild(underageBtn);
+      }
+
+      // SCREEN 10: DULCERÍA INTERACTIVE STEPPERS & CURRENCY
+      else if (screenId === '10') {
+        // Currency Switcher Button over ticker
+        const currPill = document.createElement('div');
+        currPill.className = 'interactive-widget currency-pill-btn';
+        currPill.style.left = '64.0%';
+        currPill.style.top = '15.4%';
+        currPill.innerHTML = `<span>${appState.currency === 'CLP' ? '🇨🇱 Ver en USD' : '🇺🇸 Ver en CLP'}</span>`;
+        currPill.addEventListener('click', () => {
+          appState.currency = appState.currency === 'CLP' ? 'USD' : 'CLP';
+          playSound('click');
+          showToast(`Divisa cambiada a ${appState.currency}`);
+          renderInteractiveWidgets('10');
+        });
+        interactiveLayer.appendChild(currPill);
+
+        // Product stepper controls coordinates
+        const productPositions = [
+          { key: 'comboMega', top: 22.2 },
+          { key: 'comboPareja', top: 27.4 },
+          { key: 'bebida32', top: 32.6 },
+          { key: 'nachos', top: 37.8 },
+          { key: 'chocolates', top: 43.0 },
+          { key: 'gomitas', top: 48.2 }
+        ];
+
+        productPositions.forEach(p => {
+          const item = appState.snacks[p.key];
+          const stepper = document.createElement('div');
+          stepper.className = 'interactive-widget stepper-control';
+          stepper.style.left = '71.0%';
+          stepper.style.top = `${p.top}%`;
+
+          stepper.innerHTML = `
+            <button class="stepper-btn minus" onclick="updateSnackQty('${p.key}', -1)">-</button>
+            <span class="stepper-qty" id="qty-${p.key}">${item.qty}</span>
+            <button class="stepper-btn plus" onclick="updateSnackQty('${p.key}', 1, this)">+</button>
+          `;
+          interactiveLayer.appendChild(stepper);
+        });
+
+        // Dynamic Live HUD Bar for Screen 10
+        const totals = getTotals();
+        let totalItems = 0;
+        Object.values(appState.snacks).forEach(s => totalItems += s.qty);
+
+        const hud = document.createElement('div');
+        hud.className = 'interactive-widget dynamic-hud-bar';
+        hud.style.left = '16.0%';
+        hud.style.top = '77.6%';
+        hud.style.width = '67.8%';
+
+        hud.innerHTML = `
+          <div class="hud-title-row">
+            <span>Confitería (${totalItems} ítems seleccionados)</span>
+            <span class="hud-badge-ok">Tasa: $940 CLP</span>
+          </div>
+          <div class="hud-price-row">
+            <span class="hud-price-main">${appState.currency === 'CLP' ? '$' + totals.snacksSubtotal.toLocaleString('es-CL') + ' CLP' : '$' + (totals.snacksSubtotal / appState.usdRate).toFixed(2) + ' USD'}</span>
+            <span class="hud-price-sub">${appState.currency === 'CLP' ? '~$' + (totals.snacksSubtotal / appState.usdRate).toFixed(2) + ' USD' : '$' + totals.snacksSubtotal.toLocaleString('es-CL') + ' CLP'}</span>
+          </div>
+          <button class="hud-action-btn" onclick="goToScreen('11')">
+            Agregar al Carro y Continuar (${totalItems} ítems) →
+          </button>
+        `;
+        interactiveLayer.appendChild(hud);
+      }
+
+      // SCREEN 11: CARRO VENTA COMBINADA & PASARELA DE PAGOS
+      else if (screenId === '11') {
+        const totals = getTotals();
+
+        // Dynamic Consolidated Total Card Overlay
+        const totalsOverlay = document.createElement('div');
+        totalsOverlay.className = 'interactive-widget';
+        totalsOverlay.style.left = '16.0%';
+        totalsOverlay.style.top = '55.5%';
+        totalsOverlay.style.width = '67.8%';
+        totalsOverlay.innerHTML = `
+          <div style="background:rgba(18,22,34,0.96); border:1px solid rgba(229,9,20,0.5); border-radius:12px; padding:10px 14px; box-shadow:0 0 15px rgba(229,9,20,0.25);">
+            <div style="display:flex; justify-content:space-between; font-size:10px; color:#cbd5e1; margin-bottom:3px;">
+              <span>Subtotal Boletos (${appState.selectedSeats.length}x):</span>
+              <strong style="color:#fff;">$${totals.ticketsSubtotal.toLocaleString('es-CL')} CLP</strong>
+            </div>
+            <div style="display:flex; justify-content:space-between; font-size:10px; color:#cbd5e1; margin-bottom:3px;">
+              <span>Subtotal Confitería:</span>
+              <strong style="color:#fff;">$${totals.snacksSubtotal.toLocaleString('es-CL')} CLP</strong>
+            </div>
+            ${appState.discountApplied ? `
+              <div style="display:flex; justify-content:space-between; font-size:10px; color:#22c55e; margin-bottom:3px;">
+                <span>Descuento Alumno (-20%):</span>
+                <strong>-$${totals.discount.toLocaleString('es-CL')} CLP</strong>
+              </div>
+            ` : ''}
+            <div style="display:flex; justify-content:space-between; font-size:9.5px; color:#94a3b8; margin-bottom:6px;">
+              <span>IVA (19% incluido):</span>
+              <span>$${totals.iva.toLocaleString('es-CL')} CLP</span>
+            </div>
+            <div style="display:flex; justify-content:space-between; align-items:baseline; border-top:1px dashed rgba(255,255,255,0.15); padding-top:6px;">
+              <span style="font-size:11px; font-weight:700; color:#fff;">TOTAL:</span>
+              <div>
+                <span style="font-size:16px; font-weight:800; color:#fff;">$${totals.total.toLocaleString('es-CL')} CLP</span>
+                <span style="font-size:10px; color:#38bdf8; margin-left:4px;">(~$${totals.totalUsd} USD)</span>
+              </div>
+            </div>
+          </div>
+        `;
+        interactiveLayer.appendChild(totalsOverlay);
+
+        // Payment Methods Selector
+        const payMethods = document.createElement('div');
+        payMethods.className = 'interactive-widget';
+        payMethods.style.left = '16.0%';
+        payMethods.style.top = '71.5%';
+        payMethods.style.width = '67.8%';
+        payMethods.style.display = 'flex';
+        payMethods.style.gap = '6px';
+
+        const methods = [
+          { id: 'debito', label: '💳 Débito' },
+          { id: 'credito', label: '💳 Crédito' },
+          { id: 'efectivo', label: '💵 Efectivo' }
+        ];
+
+        methods.forEach(m => {
+          const btn = document.createElement('div');
+          btn.className = `payment-pill-btn ${appState.paymentMethod === m.id ? 'selected' : ''}`;
+          btn.style.flex = '1';
+          btn.textContent = m.label;
+          btn.addEventListener('click', () => {
+            appState.paymentMethod = m.id;
+            playSound('click');
+            renderInteractiveWidgets('11');
+          });
+          payMethods.appendChild(btn);
+        });
+        interactiveLayer.appendChild(payMethods);
+
+        // Student coupon discount chip
+        const couponBar = document.createElement('div');
+        couponBar.className = 'interactive-widget';
+        couponBar.style.left = '16.0%';
+        couponBar.style.top = '77.2%';
+        couponBar.style.width = '67.8%';
+        couponBar.style.textAlign = 'center';
+        couponBar.innerHTML = `
+          <button style="background:rgba(34,197,94,0.15); border:1px solid rgba(34,197,94,0.35); color:#4ade80; padding:4px 8px; border-radius:6px; font-size:9.5px; cursor:pointer;" onclick="toggleDiscount()">
+            🏷️ ${appState.discountApplied ? '✓ Cupón INACAP Aplicado (-20%)' : 'Aplicar Cupón Alumno INACAP (-20%)'}
+          </button>
+        `;
+        interactiveLayer.appendChild(couponBar);
+
+        // Confirm Payment Button -> Triggers Transbank Webpay
+        const payBtn = document.createElement('div');
+        payBtn.className = 'interactive-widget';
+        payBtn.style.left = '16.0%';
+        payBtn.style.top = '81.8%';
+        payBtn.style.width = '67.8%';
+        payBtn.innerHTML = `
+          <button class="hud-action-btn" style="width:100%; font-size:12.5px; padding:10px;" onclick="openTransbankSimulation()">
+            🔒 Confirmar Pago y Emitir Comprobante ($${totals.total.toLocaleString('es-CL')} CLP)
+          </button>
+        `;
+        interactiveLayer.appendChild(payBtn);
+      }
+
+      // SCREEN 12: COMPROBANTE UNIFICADO & TICKET QR
+      else if (screenId === '12') {
+        const qrHotspot = document.createElement('div');
+        qrHotspot.className = 'interactive-widget';
+        qrHotspot.style.left = '18.5%';
+        qrHotspot.style.top = '80.0%';
+        qrHotspot.style.width = '12.0%';
+        qrHotspot.style.height = '5.0%';
+        qrHotspot.style.cursor = 'pointer';
+        qrHotspot.title = "Clic para ver código QR en grande";
+        qrHotspot.addEventListener('click', () => openQrModal());
+        interactiveLayer.appendChild(qrHotspot);
+
+        // Print Ticket Action
+        const printBtn = document.createElement('div');
+        printBtn.className = 'interactive-widget';
+        printBtn.style.left = '15.9%';
+        printBtn.style.top = '86.8%';
+        printBtn.style.width = '33.2%';
+        printBtn.style.height = '4.0%';
+        printBtn.style.cursor = 'pointer';
+        printBtn.title = "Imprimir ticket térmico";
+        printBtn.addEventListener('click', () => triggerThermalPrint());
+        interactiveLayer.appendChild(printBtn);
+
+        // Share via WhatsApp / Email button
+        const shareBtn = document.createElement('div');
+        shareBtn.className = 'interactive-widget';
+        shareBtn.style.left = '16.0%';
+        shareBtn.style.top = '92.0%';
+        shareBtn.style.width = '68.0%';
+        shareBtn.style.textAlign = 'center';
+        shareBtn.innerHTML = `
+          <button style="background:rgba(37,211,102,0.18); border:1px solid rgba(37,211,102,0.4); color:#4ade80; font-size:10px; padding:5px 10px; border-radius:6px; cursor:pointer;" onclick="shareTicketPrompt()">
+            📱 Enviar Comprobante por WhatsApp / Email
+          </button>
+        `;
+        interactiveLayer.appendChild(shareBtn);
+      }
+    }
+
+    // Toggle seat logic
+    function toggleSeat(seatId) {
+      const idx = appState.selectedSeats.indexOf(seatId);
+      if (idx > -1) {
+        appState.selectedSeats.splice(idx, 1);
+        playSound('seat');
+        showToast(`Butaca ${seatId} desmarcada`);
+      } else {
+        appState.selectedSeats.push(seatId);
+        playSound('seat');
+        showToast(`🎟️ Butaca ${seatId} agregada`);
+      }
+      renderInteractiveWidgets('07');
+    }
+
+    // Update snack quantity
+    function updateSnackQty(key, delta, element = null) {
+      const item = appState.snacks[key];
+      if (!item) return;
+      const newQty = Math.max(0, item.qty + delta);
+      if (newQty !== item.qty) {
+        item.qty = newQty;
+        if (delta > 0) {
+          playSound('snack');
+          if (element) {
+            const plus = document.createElement('span');
+            plus.className = 'floating-plus-one';
+            plus.textContent = '+1';
+            plus.style.left = `${element.getBoundingClientRect().left - viewport.getBoundingClientRect().left + 8}px`;
+            plus.style.top = `${element.getBoundingClientRect().top - viewport.getBoundingClientRect().top - 10}px`;
+            viewport.appendChild(plus);
+            setTimeout(() => plus.remove(), 800);
+          }
+        } else {
+          playSound('click');
+        }
+        renderInteractiveWidgets('10');
+      }
+    }
+
+    // Toggle coupon
+    function toggleDiscount() {
+      appState.discountApplied = !appState.discountApplied;
+      playSound(appState.discountApplied ? 'success' : 'click');
+      showToast(appState.discountApplied ? '🎉 Descuento INACAP -20% aplicado con éxito' : 'Descuento removido');
+      renderInteractiveWidgets('11');
+    }
+
+    // Quick Fill for Login
+    function quickFillLogin(role) {
+      playSound('success');
+      showToast(`🔑 Credenciales cargadas: ${role === 'cajero' ? 'Débora S.' : 'Carlos M.'}`);
+      setTimeout(() => goToScreen('02'), 300);
+    }
+
+    // Transbank Payment Simulation
+    function openTransbankSimulation() {
+      const totals = getTotals();
+      document.getElementById('tbAmountDisplay').textContent = `$${totals.total.toLocaleString('es-CL')} CLP`;
+      transbankModal.classList.add('open');
+      playSound('click');
+
+      const s1 = document.getElementById('tbStep1');
+      const s2 = document.getElementById('tbStep2');
+      const s3 = document.getElementById('tbStep3');
+      const spin1 = document.getElementById('tbSpin1');
+      const icon2 = document.getElementById('tbIcon2');
+      const icon3 = document.getElementById('tbIcon3');
+
+      // Reset states
+      s1.className = 'tb-step-item active';
+      s2.className = 'tb-step-item';
+      s3.className = 'tb-step-item';
+      icon2.textContent = '⏳';
+      icon3.textContent = '⏳';
+
+      // Step 2
+      setTimeout(() => {
+        s1.className = 'tb-step-item done';
+        spin1.style.display = 'none';
+        s1.insertAdjacentHTML('afterbegin', '<span style="color:#22c55e;">✓</span>');
+        s2.className = 'tb-step-item active';
+        icon2.textContent = '💳';
+        playSound('click');
+      }, 900);
+
+      // Step 3
+      setTimeout(() => {
+        s2.className = 'tb-step-item done';
+        icon2.textContent = '✓';
+        s3.className = 'tb-step-item active done';
+        icon3.textContent = '✅';
+        playSound('success');
+      }, 1900);
+
+      // Finish & Go to Screen 12
+      setTimeout(() => {
+        transbankModal.classList.remove('open');
+        goToScreen('12');
+        showToast('🎉 ¡Pago aprobado por Transbank! Folio #CIN-2026-08942 generado', 3500);
+      }, 2800);
+    }
+
+    // QR Lightbox
+    function openQrModal() {
+      document.getElementById('qrSeatsLabel').textContent = `Butacas: ${appState.selectedSeats.join(', ')} | Acceso Sala 3`;
+      qrModal.classList.add('open');
+      playSound('click');
+    }
+
+    function closeQrModal() {
+      qrModal.classList.remove('open');
+    }
+
+    // Thermal Printer Simulation
+    function triggerThermalPrint() {
+      playSound('print');
+      showToast('🖨️ Imprimiendo ticket térmico tributario...', 3000);
+
+      // Populate thermal receipt data
+      const totals = getTotals();
+      document.getElementById('receiptTotal').textContent = `$${totals.total.toLocaleString('es-CL')} CLP`;
+      const itemsList = document.getElementById('receiptItemsList');
+      itemsList.innerHTML = `
+        <div style="display:flex; justify-content:space-between; margin-bottom:2px;">
+          <span>${appState.selectedSeats.length}x ${appState.movie} (${appState.selectedSeats.join(', ')})</span>
+          <span>$${totals.ticketsSubtotal.toLocaleString('es-CL')}</span>
+        </div>
+      `;
+
+      Object.values(appState.snacks).forEach(s => {
+        if (s.qty > 0) {
+          itemsList.innerHTML += `
+            <div style="display:flex; justify-content:space-between; margin-bottom:2px;">
+              <span>${s.qty}x ${s.name}</span>
+              <span>$${(s.priceClp * s.qty).toLocaleString('es-CL')}</span>
+            </div>
+          `;
+        }
+      });
+
+      if (appState.discountApplied) {
+        itemsList.innerHTML += `
+          <div style="display:flex; justify-content:space-between; color:#15803d; margin-bottom:2px;">
+            <span>DESCUENTO ALUMNO (-20%)</span>
+            <span>-$${totals.discount.toLocaleString('es-CL')}</span>
+          </div>
+        `;
+      }
+
+      thermalReceipt.classList.add('sliding-out');
+    }
+
+    function closeReceipt() {
+      thermalReceipt.classList.remove('sliding-out');
+    }
+
+    // Share Ticket prompt
+    function shareTicketPrompt() {
+      const phone = prompt("Ingresa el número celular para envío WhatsApp (+56 9):", "+56 9 8765 4321");
+      if (phone) {
+        playSound('success');
+        showToast(`📲 Comprobante y boletos QR enviados a ${phone}`, 3500);
+      }
+    }
+
+    // Reset for new sale
+    function startNewSale() {
+      appState.selectedSeats = ["C5", "C6"];
+      appState.snacks.comboMega.qty = 1;
+      appState.snacks.comboPareja.qty = 0;
+      appState.snacks.bebida32.qty = 0;
+      appState.snacks.nachos.qty = 0;
+      appState.snacks.chocolates.qty = 1;
+      appState.snacks.gomitas.qty = 0;
+      appState.discountApplied = false;
+      showToast("🔄 Nueva transacción iniciada");
+      goToScreen('06');
+    }
+
+    // Hints Overlay
     function toggleHints() {
       hintsActive = !hintsActive;
       viewport.classList.toggle('show-hints', hintsActive);
       toggleHintsBtn.classList.toggle('active', hintsActive);
-      toggleHintsBtn.querySelector('span').textContent = hintsActive ? 'Pistas Activas' : 'Mostrar Pistas';
+      toggleHintsBtn.querySelector('span').textContent = hintsActive ? 'Pistas Activas' : 'Pistas';
     }
 
-    // Flash hints briefly when user clicks blank area
     function flashHotspots() {
       document.querySelectorAll('.hotspot').forEach(el => {
         el.classList.remove('flash-hint');
-        void el.offsetWidth; // force reflow
+        void el.offsetWidth;
         el.classList.add('flash-hint');
       });
     }
 
-    // Touch/click ripple effect
     function createRipple(e, element) {
       const rect = element.getBoundingClientRect();
       const ripple = document.createElement('span');
@@ -870,7 +2172,6 @@
       setTimeout(() => ripple.remove(), 500);
     }
 
-    // Floating Toasts
     function showToast(message, duration = 2500) {
       const toast = document.createElement('div');
       toast.className = 'toast';
@@ -884,24 +2185,18 @@
       }, duration);
     }
 
-    // Keyboard navigation
     function navigateNext() {
       const keys = Object.keys(screens);
       const idx = keys.indexOf(currentScreenId);
-      if (idx < keys.length - 1) {
-        goToScreen(keys[idx + 1]);
-      }
+      if (idx < keys.length - 1) goToScreen(keys[idx + 1]);
     }
 
     function navigatePrev() {
       const keys = Object.keys(screens);
       const idx = keys.indexOf(currentScreenId);
-      if (idx > 0) {
-        goToScreen(keys[idx - 1]);
-      }
+      if (idx > 0) goToScreen(keys[idx - 1]);
     }
 
-    // Run on ready
     window.addEventListener('DOMContentLoaded', init);
   </script>
 </body>
