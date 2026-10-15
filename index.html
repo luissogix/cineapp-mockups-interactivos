@@ -1,0 +1,908 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>CineApp - Prototipo Interactivo (Metodología)</title>
+  <style>
+    :root {
+      --bg: #090b10;
+      --card-bg: #141824;
+      --accent: #e50914;
+      --accent-glow: rgba(229, 9, 20, 0.4);
+      --hotspot-color: rgba(56, 189, 248, 0.35);
+      --hotspot-border: #38bdf8;
+      --text: #f1f5f9;
+      --text-muted: #94a3b8;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      user-select: none;
+      -webkit-user-select: none;
+    }
+
+    body {
+      background-color: var(--bg);
+      background-image: 
+        radial-gradient(circle at 50% 10%, rgba(229, 9, 20, 0.12), transparent 45%),
+        radial-gradient(circle at 80% 80%, rgba(56, 189, 248, 0.08), transparent 40%);
+      color: var(--text);
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      overflow-x: hidden;
+    }
+
+    /* Top Control Bar */
+    header {
+      background: rgba(20, 24, 36, 0.85);
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+      border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+      padding: 10px 24px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+      z-index: 100;
+      position: sticky;
+      top: 0;
+    }
+
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .logo-badge {
+      background: linear-gradient(135deg, #e50914, #b20710);
+      color: white;
+      font-weight: 800;
+      font-size: 13px;
+      letter-spacing: 0.5px;
+      padding: 4px 10px;
+      border-radius: 6px;
+      box-shadow: 0 0 15px var(--accent-glow);
+    }
+
+    .brand h1 {
+      font-size: 15px;
+      font-weight: 600;
+      color: #fff;
+    }
+
+    .brand span {
+      font-size: 12px;
+      color: var(--text-muted);
+      margin-left: 6px;
+    }
+
+    .controls {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .btn {
+      background: rgba(255, 255, 255, 0.06);
+      border: 1px solid rgba(255, 255, 255, 0.12);
+      color: var(--text);
+      padding: 7px 14px;
+      border-radius: 8px;
+      font-size: 12px;
+      font-weight: 500;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      transition: all 0.2s ease;
+    }
+
+    .btn:hover {
+      background: rgba(255, 255, 255, 0.12);
+      border-color: rgba(255, 255, 255, 0.25);
+    }
+
+    .btn.active {
+      background: rgba(56, 189, 248, 0.15);
+      border-color: var(--hotspot-border);
+      color: #38bdf8;
+      box-shadow: 0 0 12px rgba(56, 189, 248, 0.3);
+    }
+
+    .select-screen {
+      background: rgba(255, 255, 255, 0.06);
+      border: 1px solid rgba(255, 255, 255, 0.15);
+      color: #fff;
+      padding: 7px 12px;
+      border-radius: 8px;
+      font-size: 12px;
+      outline: none;
+      cursor: pointer;
+      max-width: 250px;
+    }
+
+    .select-screen option {
+      background: #141824;
+      color: #fff;
+    }
+
+    /* Main Container */
+    main {
+      flex: 1;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      padding: 16px;
+      position: relative;
+    }
+
+    /* Phone Mockup Canvas */
+    .phone-viewport {
+      position: relative;
+      width: min(92vw, 460px, calc((100vh - 110px) * (768 / 1376)));
+      aspect-ratio: 768 / 1376;
+      border-radius: 44px;
+      box-shadow: 
+        0 25px 60px -15px rgba(0, 0, 0, 0.9),
+        0 0 40px rgba(229, 9, 20, 0.15),
+        inset 0 0 0 1px rgba(255, 255, 255, 0.15);
+      overflow: hidden;
+      background: #000;
+      transition: transform 0.2s ease;
+    }
+
+    .screen-img {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      object-fit: contain;
+      display: none;
+      opacity: 0;
+      transition: opacity 0.22s ease-in-out;
+      pointer-events: none;
+    }
+
+    .screen-img.active {
+      display: block;
+      opacity: 1;
+    }
+
+    /* Hotspot Layer */
+    .hotspots-layer {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      z-index: 10;
+    }
+
+    .hotspot {
+      position: absolute;
+      cursor: pointer;
+      border-radius: 8px;
+      transition: background-color 0.18s ease, box-shadow 0.18s ease, transform 0.08s ease;
+      z-index: 20;
+    }
+
+    .hotspot:active {
+      transform: scale(0.985);
+    }
+
+    /* Visible Hints Mode */
+    .show-hints .hotspot {
+      background: var(--hotspot-color) !important;
+      border: 1.5px solid var(--hotspot-border) !important;
+      box-shadow: 0 0 10px rgba(56, 189, 248, 0.5) !important;
+      animation: pulse-hotspot 2s infinite ease-in-out;
+    }
+
+    @keyframes pulse-hotspot {
+      0%, 100% { opacity: 0.7; }
+      50% { opacity: 1; }
+    }
+
+    /* Flash Hotspots when clicking empty space */
+    .flash-hint {
+      background: rgba(56, 189, 248, 0.3) !important;
+      border: 1.5px dashed #38bdf8 !important;
+      animation: flash-anim 0.45s ease-out forwards;
+    }
+
+    @keyframes flash-anim {
+      0% { opacity: 0; }
+      50% { opacity: 1; }
+      100% { opacity: 0; }
+    }
+
+    /* Click Ripple Effect */
+    .ripple {
+      position: absolute;
+      border-radius: 50%;
+      background: rgba(255, 255, 255, 0.45);
+      transform: scale(0);
+      animation: ripple-anim 0.45s linear;
+      pointer-events: none;
+      z-index: 50;
+    }
+
+    @keyframes ripple-anim {
+      to {
+        transform: scale(3.5);
+        opacity: 0;
+      }
+    }
+
+    /* Floating Toast Notifications */
+    .toast-container {
+      position: fixed;
+      bottom: 24px;
+      left: 50%;
+      transform: translateX(-50%);
+      z-index: 200;
+      pointer-events: none;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      align-items: center;
+    }
+
+    .toast {
+      background: rgba(18, 22, 34, 0.95);
+      border: 1px solid rgba(255, 255, 255, 0.15);
+      color: #fff;
+      padding: 10px 18px;
+      border-radius: 10px;
+      font-size: 13px;
+      box-shadow: 0 12px 30px rgba(0, 0, 0, 0.6);
+      backdrop-filter: blur(8px);
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      animation: toast-in 0.25s ease-out forwards;
+    }
+
+    @keyframes toast-in {
+      from {
+        opacity: 0;
+        transform: translateY(12px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    /* Flow Scenario Quick Panel */
+    .scenario-drawer {
+      position: fixed;
+      right: -320px;
+      top: 60px;
+      width: 320px;
+      height: calc(100vh - 60px);
+      background: rgba(15, 19, 30, 0.96);
+      border-left: 1px solid rgba(255, 255, 255, 0.1);
+      backdrop-filter: blur(15px);
+      z-index: 90;
+      transition: right 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+      padding: 20px;
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+      overflow-y: auto;
+    }
+
+    .scenario-drawer.open {
+      right: 0;
+      box-shadow: -10px 0 35px rgba(0, 0, 0, 0.7);
+    }
+
+    .drawer-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding-bottom: 12px;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    }
+
+    .drawer-header h3 {
+      font-size: 14px;
+      color: #fff;
+      font-weight: 600;
+    }
+
+    .drawer-close {
+      background: transparent;
+      border: none;
+      color: var(--text-muted);
+      cursor: pointer;
+      font-size: 18px;
+    }
+
+    .scenario-card {
+      background: rgba(255, 255, 255, 0.04);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      border-radius: 10px;
+      padding: 12px;
+      cursor: pointer;
+      transition: all 0.2s ease;
+    }
+
+    .scenario-card:hover {
+      background: rgba(255, 255, 255, 0.08);
+      border-color: rgba(255, 255, 255, 0.2);
+      transform: translateY(-2px);
+    }
+
+    .scenario-card h4 {
+      font-size: 13px;
+      margin-bottom: 4px;
+      color: #fff;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .scenario-card p {
+      font-size: 11px;
+      color: var(--text-muted);
+      line-height: 1.4;
+    }
+
+    .scenario-steps {
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+      margin-top: 8px;
+    }
+
+    .scenario-step {
+      font-size: 10.5px;
+      color: #cbd5e1;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .scenario-step::before {
+      content: "•";
+      color: #e50914;
+      font-weight: bold;
+    }
+
+    /* Print styling */
+    @media print {
+      header, .scenario-drawer, .toast-container, .controls {
+        display: none !important;
+      }
+      body, main {
+        background: #fff;
+        padding: 0;
+      }
+      .phone-viewport {
+        box-shadow: none;
+        border: none;
+        width: 100%;
+        max-width: 600px;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Top Navbar Controls -->
+  <header>
+    <div class="brand">
+      <div class="logo-badge">CineApp</div>
+      <h1>Prototipo Interactivo <span>| Metodología de Desarrollo</span></h1>
+    </div>
+
+    <div class="controls">
+      <!-- Screen Dropdown Selector -->
+      <select id="screenSelect" class="select-screen" title="Seleccionar pantalla directamente">
+        <!-- Populated via JS -->
+      </select>
+
+      <!-- Hotspot Hints Toggle -->
+      <button id="toggleHintsBtn" class="btn" title="Atajo: Tecla H">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <path d="M9 18h6M10 22h4M12 2a7 7 0 0 0-7 7c0 2.38 1.19 4.47 3 5.74V17a1 1 0 0 0 1 1h6a1 1 0 0 0 1-1v-2.26c1.81-1.27 3-3.36 3-5.74a7 7 0 0 0-7-7z"/>
+        </svg>
+        <span>Mostrar Pistas</span>
+      </button>
+
+      <!-- Scenarios Drawer Button -->
+      <button id="toggleScenariosBtn" class="btn">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <line x1="8" y1="6" x2="21" y2="6"></line>
+          <line x1="8" y1="12" x2="21" y2="12"></line>
+          <line x1="8" y1="18" x2="21" y2="18"></line>
+          <line x1="3" y1="6" x2="3.01" y2="6"></line>
+          <line x1="3" y1="12" x2="3.01" y2="12"></line>
+          <line x1="3" y1="18" x2="3.01" y2="18"></line>
+        </svg>
+        <span>Flujos / Casos</span>
+      </button>
+
+      <!-- Fullscreen Button -->
+      <button id="fullscreenBtn" class="btn" title="Pantalla completa">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <path d="M8 3H5a2 2 0 0 0-2 2v3m18 0V5a2 2 0 0 0-2-2h-3m0 18h3a2 2 0 0 0 2-2v-3M3 16v3a2 2 0 0 0 2 2h3"/>
+        </svg>
+      </button>
+    </div>
+  </header>
+
+  <!-- Main Prototyping Viewport -->
+  <main>
+    <div class="phone-viewport" id="viewport">
+      <!-- Screen Images will be dynamically rendered here -->
+      <div id="screensContainer"></div>
+
+      <!-- Hotspot Interactive Layer -->
+      <div class="hotspots-layer" id="hotspotsLayer"></div>
+    </div>
+  </main>
+
+  <!-- Quick Scenarios Drawer -->
+  <aside class="scenario-drawer" id="scenarioDrawer">
+    <div class="drawer-header">
+      <h3>Flujos del Sistema</h3>
+      <button class="drawer-close" id="closeDrawerBtn">&times;</button>
+    </div>
+
+    <div class="scenario-card" onclick="goToScreen('01')">
+      <h4>🎬 Flujo 1: Camino Feliz Completo</h4>
+      <p>Proceso exitoso de inicio de sesión, reserva de butaca, control legal y emisión de comprobante consolidado.</p>
+      <div class="scenario-steps">
+        <div class="scenario-step">1. Iniciar sesión institucional</div>
+        <div class="scenario-step">2. Seleccionar función en Cartelera</div>
+        <div class="scenario-step">3. Elegir butacas C5 y C6</div>
+        <div class="scenario-step">4. Validación de edad (+18)</div>
+        <div class="scenario-step">5. Agregar confitería (USD/CLP)</div>
+        <div class="scenario-step">6. Pago y comprobante unificado</div>
+      </div>
+    </div>
+
+    <div class="scenario-card" onclick="goToScreen('04')">
+      <h4>⚠️ Flujo 2: Error de Credenciales</h4>
+      <p>Simulación de autenticación fallida con bloqueo progresivo por seguridad institucional.</p>
+      <div class="scenario-steps">
+        <div class="scenario-step">Pantalla 04: Credenciales erróneas</div>
+        <div class="scenario-step">Reintentar o recuperar clave con OTP</div>
+      </div>
+    </div>
+
+    <div class="scenario-card" onclick="goToScreen('05')">
+      <h4>🔑 Flujo 3: Recuperación de Clave</h4>
+      <p>Restablecimiento de contraseña con código OTP de 6 dígitos validado.</p>
+    </div>
+
+    <div class="scenario-card" onclick="goToScreen('09')">
+      <h4>🚫 Flujo 4: Reglas de Negocio / Bloqueos</h4>
+      <p>Visualización de excepciones del sistema: venta rechazada por edad (+18) o aforo de sala al 100%.</p>
+    </div>
+
+    <div class="scenario-card" onclick="goToScreen('12')">
+      <h4>🧾 Flujo 5: Comprobante y Cierre</h4>
+      <p>Folio unificado tributario, códigos de entrada QR y despacho térmico de tickets.</p>
+    </div>
+  </aside>
+
+  <!-- Floating Toast Notifications -->
+  <div class="toast-container" id="toastContainer"></div>
+
+  <script>
+    // Audio synthesizer for native tactical clicks
+    const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+    function playTapSound(type = 'click') {
+      try {
+        if (audioCtx.state === 'suspended') {
+          audioCtx.resume();
+        }
+        const osc = audioCtx.createOscillator();
+        const gain = audioCtx.createGain();
+        osc.connect(gain);
+        gain.connect(audioCtx.destination);
+
+        const now = audioCtx.currentTime;
+        if (type === 'click') {
+          osc.frequency.setValueAtTime(800, now);
+          osc.frequency.exponentialRampToValueAtTime(350, now + 0.04);
+          gain.gain.setValueAtTime(0.12, now);
+          gain.gain.exponentialRampToValueAtTime(0.01, now + 0.04);
+          osc.start(now);
+          osc.stop(now + 0.04);
+        } else if (type === 'success') {
+          osc.frequency.setValueAtTime(520, now);
+          osc.frequency.exponentialRampToValueAtTime(880, now + 0.09);
+          gain.gain.setValueAtTime(0.15, now);
+          gain.gain.exponentialRampToValueAtTime(0.01, now + 0.09);
+          osc.start(now);
+          osc.stop(now + 0.09);
+        }
+      } catch(e) {}
+    }
+
+    // Screens metadata definition (all images: 768 x 1376)
+    const screens = {
+      "01": {
+        id: "01",
+        name: "01. Login (Blanco)",
+        file: "Mockup_01_Login_Blanco.png",
+        hotspots: [
+          // Campo Correo o Contraseña -> Salta a datos validados
+          { left: 16.9, top: 44.7, width: 66.2, height: 4.8, title: "Escribir credenciales", target: "02" },
+          { left: 16.9, top: 51.6, width: 66.2, height: 4.8, title: "Escribir contraseña", target: "02" },
+          // ¿Olvidaste tu contraseña? -> Recuperar contraseña
+          { left: 34.0, top: 62.3, width: 32.0, height: 2.8, title: "¿Olvidaste tu contraseña?", target: "05" },
+          // Simular error de credenciales con clic en el logo
+          { left: 34.0, top: 30.0, width: 32.0, height: 5.0, title: "Test: Simular error", target: "04" },
+          // Crear cuenta
+          { left: 16.9, top: 65.8, width: 66.2, height: 4.0, title: "Crear una cuenta", action: () => showToast("ℹ️ Creación de cuenta restringida a Administrador") }
+        ]
+      },
+      "02": {
+        id: "02",
+        name: "02. Login (Datos Validados)",
+        file: "Mockup_02_Login_Datos_Validados.png",
+        hotspots: [
+          // Botón Iniciar Sesión (Rojo Activo)
+          { left: 16.9, top: 57.7, width: 66.2, height: 4.2, title: "Iniciar Sesión", target: "03", sound: 'success' },
+          // ¿Olvidaste tu contraseña?
+          { left: 34.0, top: 62.3, width: 32.0, height: 2.8, title: "¿Olvidaste tu contraseña?", target: "05" },
+          // Ojo / Borrar contraseña -> Vuelve a blanco
+          { left: 75.0, top: 52.0, width: 8.0, height: 4.0, title: "Limpiar campo", target: "01" },
+          // Logo superior -> Probar credenciales erróneas
+          { left: 34.0, top: 30.0, width: 32.0, height: 5.0, title: "Simular error de login", target: "04" }
+        ]
+      },
+      "03": {
+        id: "03",
+        name: "03. Login Exitoso (Modal)",
+        file: "Mockup_03_Login_Exitoso.png",
+        hotspots: [
+          // Botón Entrar al Sistema (Verde)
+          { left: 17.0, top: 64.0, width: 66.0, height: 4.6, title: "Entrar al Sistema", target: "06", sound: 'success' }
+        ]
+      },
+      "04": {
+        id: "04",
+        name: "04. Login Error Credenciales",
+        file: "Mockup_04_Login_Error_Credenciales.png",
+        hotspots: [
+          // Botón Reintentar Inicio de Sesión
+          { left: 17.0, top: 55.5, width: 66.0, height: 4.2, title: "Reintentar Inicio de Sesión", target: "02" },
+          // ¿Olvidaste tu contraseña? Restablécela aquí
+          { left: 17.0, top: 61.0, width: 66.0, height: 3.8, title: "Restablecer contraseña", target: "05" }
+        ]
+      },
+      "05": {
+        id: "05",
+        name: "05. Recuperar Contraseña",
+        file: "Mockup_05_Recuperar_Contrasena.png",
+        hotspots: [
+          // Flecha volver atrás
+          { left: 15.6, top: 11.2, width: 8.0, height: 4.2, title: "Volver atrás", target: "01" },
+          // Botón Guardar y Volver a Iniciar Sesión
+          { left: 16.9, top: 49.8, width: 66.2, height: 4.2, title: "Guardar y Volver a Iniciar Sesión", target: "02", action: () => showToast("✅ Contraseña actualizada correctamente", 3000) }
+        ]
+      },
+      "06": {
+        id: "06",
+        name: "06. Cartelera y Formatos",
+        file: "Mockup_06_Cartelera_Funciones_Formatos.png",
+        hotspots: [
+          // Botón rojo Seleccionar Asientos y Validar Aforo
+          { left: 15.9, top: 82.0, width: 68.2, height: 3.6, title: "Seleccionar Asientos y Validar Aforo", target: "07", sound: 'success' },
+          // Formatos de Sala
+          { left: 17.0, top: 38.8, width: 23.0, height: 5.5, title: "2D Tradicional", action: () => showToast("Formato 2D seleccionado") },
+          { left: 40.5, top: 38.8, width: 23.0, height: 5.5, title: "3D Digital (Seleccionado)", action: () => showToast("Sala 3D Digital activa") },
+          { left: 64.0, top: 38.8, width: 23.0, height: 5.5, title: "Sala VIP", action: () => showToast("Sala VIP seleccionada") },
+          // Otras películas: The Batman (+14) -> Probar pantalla de reglas de negocio
+          { left: 51.0, top: 62.8, width: 33.0, height: 4.6, title: "The Batman (+14) - Ver bloqueo", target: "09" },
+          { left: 17.0, top: 62.8, width: 33.0, height: 4.6, title: "Dune: Parte 2", action: () => showToast("Película: Dune Parte 2") },
+          // Barra inferior de navegación
+          ...getBottomNavHotspots()
+        ]
+      },
+      "07": {
+        id: "07",
+        name: "07. Mapa de Asientos",
+        file: "Mockup_07_Mapa_Asientos_Aforo.png",
+        hotspots: [
+          // Flecha volver
+          { left: 15.6, top: 11.2, width: 8.0, height: 4.2, title: "Volver a Cartelera", target: "06" },
+          // Botón Continuar al Pago / Dulcería -> Pasa al filtro legal +18
+          { left: 17.7, top: 81.4, width: 64.3, height: 3.4, title: "Continuar al Pago / Dulcería", target: "08" },
+          // Área de butacas (interactiva)
+          { left: 26.0, top: 37.0, width: 48.0, height: 21.0, title: "Butacas C5, C6 seleccionadas", action: () => showToast("🎟️ Butacas C5 y C6 asignadas ($12.000 CLP)") },
+          // Barra inferior de navegación
+          ...getBottomNavHotspots()
+        ]
+      },
+      "08": {
+        id: "08",
+        name: "08. Modal Restricción Edad (+18)",
+        file: "Mockup_08_Modal_Restriccion_Edad.png",
+        hotspots: [
+          // Botón Confirmar y Continuar Venta -> Pasa a Dulcería
+          { left: 18.2, top: 56.7, width: 63.5, height: 3.8, title: "Confirmar y Continuar Venta", target: "10", sound: 'success' },
+          // Cancelar Transacción -> Vuelve al mapa de asientos
+          { left: 34.0, top: 61.2, width: 32.0, height: 2.8, title: "Cancelar Transacción", target: "07" },
+          // Clic en el círculo +18 -> Simular bloqueo por edad insuficiente
+          { left: 44.0, top: 24.5, width: 12.0, height: 6.8, title: "Simular error de edad (-18)", target: "09" },
+          // Barra inferior de navegación
+          ...getBottomNavHotspots()
+        ]
+      },
+      "09": {
+        id: "09",
+        name: "09. Bloqueos y Reglas de Negocio",
+        file: "Mockup_09_Mensaje_Bloqueo_Aforo_Edad.png",
+        hotspots: [
+          // Botón Seleccionar Otra Función o Sala
+          { left: 15.9, top: 78.5, width: 68.2, height: 3.5, title: "Seleccionar Otra Función o Sala", target: "06" },
+          // Volver al Menú Principal
+          { left: 15.9, top: 82.5, width: 68.2, height: 3.1, title: "Volver a Cartelera", target: "06" },
+          // Barra inferior de navegación
+          ...getBottomNavHotspots()
+        ]
+      },
+      "10": {
+        id: "10",
+        name: "10. Dulcería (Conversión USD/CLP)",
+        file: "Mockup_10_Dulceria_Conversion_USD_CLP.png",
+        hotspots: [
+          // Botón Agregar al Carro y Continuar
+          { left: 17.4, top: 81.4, width: 64.8, height: 3.4, title: "Agregar al Carro y Continuar", target: "11", sound: 'success' },
+          // Botones + y - de confitería
+          { left: 74.0, top: 22.0, width: 7.5, height: 2.8, title: "+ Combo Mega", action: () => showToast("🍿 Combo Mega Popcorn ($8.500 CLP)") },
+          { left: 74.0, top: 32.4, width: 7.5, height: 2.8, title: "+ Bebida 32oz", action: () => showToast("🥤 Bebida Grande 32oz ($3.200 CLP)") },
+          { left: 74.0, top: 42.6, width: 7.5, height: 2.8, title: "+ Chocolates USD", action: () => showToast("🍫 Chocolates Suizos ($4.50 USD = $4.230 CLP)") },
+          // Barra inferior de navegación
+          ...getBottomNavHotspots()
+        ]
+      },
+      "11": {
+        id: "11",
+        name: "11. Carro Venta Combinada",
+        file: "Mockup_11_Carro_Venta_Combinada.png",
+        hotspots: [
+          // Botón Confirmar Pago y Emitir Comprobante
+          { left: 15.9, top: 82.1, width: 68.2, height: 3.5, title: "Confirmar Pago y Emitir Comprobante", target: "12", sound: 'success' },
+          // Selección de métodos de pago
+          { left: 16.0, top: 68.0, width: 22.0, height: 3.5, title: "Débito RedCompra (Seleccionado)", action: () => showToast("💳 Pago con Débito seleccionado") },
+          { left: 39.0, top: 68.0, width: 22.0, height: 3.5, title: "Crédito Bancario", action: () => showToast("💳 Tarjeta de Crédito seleccionada") },
+          { left: 62.0, top: 68.0, width: 22.0, height: 3.5, title: "Efectivo", action: () => showToast("💵 Pago en Efectivo seleccionado") },
+          // Barra inferior de navegación
+          ...getBottomNavHotspots()
+        ]
+      },
+      "12": {
+        id: "12",
+        name: "12. Comprobante Folio Unificado",
+        file: "Mockup_12_Comprobante_Folio_Unificado.png",
+        hotspots: [
+          // Botón Imprimir Ticket
+          { 
+            left: 15.9, top: 87.2, width: 33.2, height: 3.3, title: "Imprimir Ticket", 
+            action: () => {
+              showToast("🖨️ Enviando ticket térmico #CIN-2026-08942 a Caja 02...", 3500);
+              setTimeout(() => window.print(), 600);
+            } 
+          },
+          // Botón Nueva Venta
+          { left: 50.8, top: 87.2, width: 33.2, height: 3.3, title: "Iniciar Nueva Venta", target: "06", sound: 'success' }
+        ]
+      }
+    };
+
+    // Helper for common bottom navigation bar
+    function getBottomNavHotspots() {
+      return [
+        { left: 15.5, top: 86.8, width: 13.8, height: 4.5, title: "Inicio", target: "06" },
+        { left: 29.3, top: 86.8, width: 13.8, height: 4.5, title: "Cartelera", target: "06" },
+        { left: 43.1, top: 86.8, width: 13.8, height: 4.5, title: "Dulcería", target: "10" },
+        { left: 56.9, top: 86.8, width: 13.8, height: 4.5, title: "Carro", target: "11" },
+        { left: 70.7, top: 86.8, width: 13.8, height: 4.5, title: "Perfil Colaborador", target: "03" }
+      ];
+    }
+
+    let currentScreenId = "01";
+    let hintsActive = false;
+
+    // DOM Elements
+    const viewport = document.getElementById('viewport');
+    const screensContainer = document.getElementById('screensContainer');
+    const hotspotsLayer = document.getElementById('hotspotsLayer');
+    const screenSelect = document.getElementById('screenSelect');
+    const toggleHintsBtn = document.getElementById('toggleHintsBtn');
+    const toggleScenariosBtn = document.getElementById('toggleScenariosBtn');
+    const scenarioDrawer = document.getElementById('scenarioDrawer');
+    const closeDrawerBtn = document.getElementById('closeDrawerBtn');
+    const fullscreenBtn = document.getElementById('fullscreenBtn');
+
+    // Initialize screens and dropdown
+    function init() {
+      // Create img elements
+      Object.values(screens).forEach((s) => {
+        const img = document.createElement('img');
+        img.src = s.file;
+        img.alt = s.name;
+        img.id = `img-${s.id}`;
+        img.className = 'screen-img';
+        screensContainer.appendChild(img);
+
+        // Populate dropdown
+        const opt = document.createElement('option');
+        opt.value = s.id;
+        opt.textContent = s.name;
+        screenSelect.appendChild(opt);
+      });
+
+      // Show initial screen
+      goToScreen("01", false);
+
+      // Event Listeners
+      screenSelect.addEventListener('change', (e) => goToScreen(e.target.value));
+      toggleHintsBtn.addEventListener('click', toggleHints);
+      toggleScenariosBtn.addEventListener('click', () => scenarioDrawer.classList.toggle('open'));
+      closeDrawerBtn.addEventListener('click', () => scenarioDrawer.classList.remove('open'));
+
+      fullscreenBtn.addEventListener('click', () => {
+        if (!document.fullscreenElement) {
+          document.documentElement.requestFullscreen().catch(() => {});
+        } else {
+          document.exitFullscreen().catch(() => {});
+        }
+      });
+
+      // Keyboard shortcuts
+      window.addEventListener('keydown', (e) => {
+        if (e.key === 'h' || e.key === 'H') {
+          toggleHints();
+        } else if (e.key === 'ArrowRight') {
+          navigateNext();
+        } else if (e.key === 'ArrowLeft') {
+          navigatePrev();
+        } else if (e.key === 'Escape') {
+          scenarioDrawer.classList.remove('open');
+        }
+      });
+
+      // Clicking empty area inside viewport flashes hints for discovery
+      viewport.addEventListener('click', (e) => {
+        if (!e.target.classList.contains('hotspot') && !hintsActive) {
+          flashHotspots();
+        }
+      });
+    }
+
+    // Switch screen logic
+    function goToScreen(screenId, playSound = true) {
+      if (!screens[screenId]) return;
+
+      currentScreenId = screenId;
+      screenSelect.value = screenId;
+
+      // Update active image with smooth transition
+      document.querySelectorAll('.screen-img').forEach(img => img.classList.remove('active'));
+      const activeImg = document.getElementById(`img-${screenId}`);
+      if (activeImg) {
+        activeImg.classList.add('active');
+      }
+
+      // Render Hotspots for current screen
+      renderHotspots(screenId);
+
+      // Close drawer if opened
+      scenarioDrawer.classList.remove('open');
+    }
+
+    function renderHotspots(screenId) {
+      hotspotsLayer.innerHTML = '';
+      const sc = screens[screenId];
+      if (!sc || !sc.hotspots) return;
+
+      sc.hotspots.forEach((h) => {
+        const div = document.createElement('div');
+        div.className = 'hotspot';
+        div.style.left = `${h.left}%`;
+        div.style.top = `${h.top}%`;
+        div.style.width = `${h.width}%`;
+        div.style.height = `${h.height}%`;
+        div.title = h.title || '';
+
+        div.addEventListener('click', (e) => {
+          e.stopPropagation();
+          createRipple(e, div);
+          playTapSound(h.sound || 'click');
+
+          if (h.action) {
+            h.action();
+          }
+
+          if (h.target) {
+            setTimeout(() => goToScreen(h.target), 60);
+          }
+        });
+
+        hotspotsLayer.appendChild(div);
+      });
+    }
+
+    // Toggle hint visual overlays
+    function toggleHints() {
+      hintsActive = !hintsActive;
+      viewport.classList.toggle('show-hints', hintsActive);
+      toggleHintsBtn.classList.toggle('active', hintsActive);
+      toggleHintsBtn.querySelector('span').textContent = hintsActive ? 'Pistas Activas' : 'Mostrar Pistas';
+    }
+
+    // Flash hints briefly when user clicks blank area
+    function flashHotspots() {
+      document.querySelectorAll('.hotspot').forEach(el => {
+        el.classList.remove('flash-hint');
+        void el.offsetWidth; // force reflow
+        el.classList.add('flash-hint');
+      });
+    }
+
+    // Touch/click ripple effect
+    function createRipple(e, element) {
+      const rect = element.getBoundingClientRect();
+      const ripple = document.createElement('span');
+      ripple.className = 'ripple';
+      const size = Math.max(rect.width, rect.height);
+      ripple.style.width = ripple.style.height = `${size}px`;
+      ripple.style.left = `${e.clientX - rect.left - size / 2}px`;
+      ripple.style.top = `${e.clientY - rect.top - size / 2}px`;
+      element.appendChild(ripple);
+      setTimeout(() => ripple.remove(), 500);
+    }
+
+    // Floating Toasts
+    function showToast(message, duration = 2500) {
+      const toast = document.createElement('div');
+      toast.className = 'toast';
+      toast.textContent = message;
+      document.getElementById('toastContainer').appendChild(toast);
+      setTimeout(() => {
+        toast.style.transition = 'opacity 0.25s, transform 0.25s';
+        toast.style.opacity = '0';
+        toast.style.transform = 'translateY(10px)';
+        setTimeout(() => toast.remove(), 260);
+      }, duration);
+    }
+
+    // Keyboard navigation
+    function navigateNext() {
+      const keys = Object.keys(screens);
+      const idx = keys.indexOf(currentScreenId);
+      if (idx < keys.length - 1) {
+        goToScreen(keys[idx + 1]);
+      }
+    }
+
+    function navigatePrev() {
+      const keys = Object.keys(screens);
+      const idx = keys.indexOf(currentScreenId);
+      if (idx > 0) {
+        goToScreen(keys[idx - 1]);
+      }
+    }
+
+    // Run on ready
+    window.addEventListener('DOMContentLoaded', init);
+  </script>
+</body>
+</html>
